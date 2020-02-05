@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('photo')->default('user.png');
             $table->integer('role_id')->unsigned();
             $table->foreign('role_id')->references('id')->on('roles');
+            $table->boolean('id_social')->default(false);
             $table->tinyInteger('status')->default(1);
             $table->rememberToken();
             $table->timestamps();

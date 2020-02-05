@@ -16,5 +16,10 @@ class RolesTableSeeder extends Seeder
             'description' => 'Administrador del sistema',
             'status' => 1,
         ]);
+        DB::table('roles')->insert([
+            'name' => 'User',
+            'description' => 'Usuario general',
+            'status' => 1,
+        ]);
     }
 }

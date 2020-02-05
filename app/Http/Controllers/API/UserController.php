@@ -66,7 +66,7 @@ class UserController extends Controller
      */
     public function profile()
     {
-        return User::find(auth('api')->user()->getAuthIdentifier())
+        return User::where('id',auth('api')->user()->getAuthIdentifier())
             ->with('roles')
             ->first();
     }
@@ -97,7 +97,7 @@ class UserController extends Controller
 
 
         }
-        $user->photo = $name;
+        $user->photo = !isset($name) ? $currentPhoto : $name;
         $user->update($request->all());
 
     }

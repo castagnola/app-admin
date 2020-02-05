@@ -21,7 +21,7 @@
                                 <th>Description</th>
                                 <th>Date Created</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th  v-if="$gate.isAdmin()">Action</th>
                             </tr>
                             </thead>
                             <tbody>
