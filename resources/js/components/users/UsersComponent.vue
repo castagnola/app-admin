@@ -105,6 +105,7 @@
                                 </select>
                                 <has-error :form="form" field="role_id"></has-error>
                             </div>
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close <i

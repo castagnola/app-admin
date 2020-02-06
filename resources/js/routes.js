@@ -31,6 +31,18 @@ export default new VueRouter({
             path: '/profile',
             component: require('./components/profile/ProfileComponent').default
         },
+        {
+            path: '/drivers',
+            component: require('./components/drivers/DriversComponent').default
+        },
+        {
+            path: '/owners',
+            component: require('./components/owners/OwnersComponent').default
+        },
+        {
+            path: '/vehicles',
+            component: require('./components/vehicles/VehiclesComponent').default
+        },
 
         {
             path: '*',

@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 /**
  * API Routes
  */
@@ -29,3 +30,5 @@ Route::put('profile','API\UserController@updateProfile');
  */
 
 Route::resource('get-roles','ResourceController\RolesController');
+Route::resource('owners','ResourceController\OwnersController');
+Route::resource('cities','ResourceController\CitiesController');

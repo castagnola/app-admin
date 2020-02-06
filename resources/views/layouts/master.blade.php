@@ -110,13 +110,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </router-link>
                             </li>
                             <li class="nav-item">
-                                <router-link to="/owner" class="nav-link">
+                                <router-link to="/owners" class="nav-link">
                                     <i class="fas fa-user-shield"></i>
                                     <p>Owner</p>
                                 </router-link>
                             </li>
                             <li class="nav-item">
-                                <router-link to="/driver" class="nav-link">
+                                <router-link to="/drivers" class="nav-link">
                                     <i class="fas fa-user-alt-slash"></i>
                                     <p>Drivers</p>
                                 </router-link>
