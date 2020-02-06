@@ -43,7 +43,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a href="index3.html" class="brand-link">
+        <a href="#" class="brand-link">
 
             <img src="./img/app.png" alt="Admin Panel Logo" class="brand-image img-circle elevation-3"
                  style="opacity: .8">
@@ -78,14 +78,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </router-link>
                     </li>
                     @can('isAdmin')
-                    <li class="nav-item">
-                        <router-link to="/users" class="nav-link">
-                            <i class=" nav-icon fas fa-users"></i>
-                            <p>
-                                Users
-                            </p>
-                        </router-link>
-                    </li>
+                        <li class="nav-item">
+                            <router-link to="/users" class="nav-link">
+                                <i class=" nav-icon fas fa-users"></i>
+                                <p>
+                                    Users
+                                </p>
+                            </router-link>
+                        </li>
                     @endcan
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
@@ -101,6 +101,24 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <router-link to="/roles" class="nav-link">
                                     <i class="fas fa-user-tag"></i>
                                     <p>Roles</p>
+                                </router-link>
+                            </li>
+                            <li class="nav-item">
+                                <router-link to="/vehicles" class="nav-link">
+                                    <i class="fas fa-truck"></i>
+                                    <p>Vehicles</p>
+                                </router-link>
+                            </li>
+                            <li class="nav-item">
+                                <router-link to="/owner" class="nav-link">
+                                    <i class="fas fa-user-shield"></i>
+                                    <p>Owner</p>
+                                </router-link>
+                            </li>
+                            <li class="nav-item">
+                                <router-link to="/driver" class="nav-link">
+                                    <i class="fas fa-user-alt-slash"></i>
+                                    <p>Drivers</p>
                                 </router-link>
                             </li>
                         </ul>
@@ -141,7 +159,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script>
         window.user = @json(auth()->user())
     </script>
-    @endauth
+@endauth
 <!-- REQUIRED SCRIPTS -->
 <script src="/js/app.js">
 

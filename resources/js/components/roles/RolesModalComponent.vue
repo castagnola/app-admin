@@ -1,12 +1,19 @@
 <template>
 <div class="container">
-    Roles modal component
+    <h1>Roles view component: {{$route.params.id}}</h1>
+<!--    <h1>Roles view component</h1>-->
 </div>
 </template>
 
 <script>
     export default {
-        name: "RolesModalComponent"
+        name:'roles-view-component',
+        data(){
+          return {
+              role:{}
+          }
+        },
+
     }
 </script>
 

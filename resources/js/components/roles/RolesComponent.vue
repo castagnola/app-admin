@@ -21,7 +21,7 @@
                                 <th>Description</th>
                                 <th>Date Created</th>
                                 <th>Status</th>
-                                <th  v-if="$gate.isAdmin()">Action</th>
+                                <th v-if="$gate.isAdmin()">Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -31,6 +31,17 @@
                                 <td>{{role.description}}</td>
                                 <td>{{role.created_at}}</td>
                                 <td>{{role.status === 1 ? 'Activo' : 'Desactivo'}}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(role)">
+                                        <i class="fa fa-edit blue"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            v-on:click="deleteRole(role.id)">
+                                        <i class="fa fa-trash red"></i>
+                                    </button>
+
+                                </td>
                             </tr>
                             </tbody>
                         </table>
@@ -42,10 +53,8 @@
 </template>
 
 <script>
-    export default {
-        components:{
 
-        },
+    export default {
         data() {
             return {
                 roles: [],
@@ -66,10 +75,9 @@
                     toast.fire('Error!', 'Roles cannot be loaded', 'error');
                 })
             },
-            newModal(){
-
-            }
-
+        },
+        home(){
+          this.$router.push('/');
         },
         created() {
             this.loadRoles();

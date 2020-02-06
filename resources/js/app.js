@@ -11,7 +11,7 @@ window.Vue = require('vue');
  * Imports
  */
 import { Form, HasError, AlertError } from 'vform';
-import VueRouter from 'vue-router';
+import router from './routes';
 import Gate from "./Gate/gate";
 import swal from 'sweetalert2';
 import moment from 'moment';
@@ -23,7 +23,6 @@ import Vue from 'vue'
 
 Vue.component(AlertError.name, AlertError)
 Vue.component(HasError.name, HasError)
-Vue.use(VueRouter)
 Vue.prototype.$gate = new Gate(window.user);
 
 window.swal = swal;
@@ -48,24 +47,7 @@ Vue.filter('myDate',function(created){
     return moment(created).format('MMMM Do YYYY');
 });
 
-/**
- * Routes
- * @type {*[]}
- */
-const routes = [
-
-    { path: '/dashboard', component: require('./components/DashboardComponent').default},
-    { path: '/users', component: require('./components/users/UsersComponent').default},
-    { path: '/roles', component: require('./components/roles/RolesComponent').default},
-    { path: '/profile', component: require('./components/profile/ProfileComponent').default},
-];
-const router = new VueRouter({
-
-    routes // short for `routes: routes`
-});
-
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-
 
 /**
  * Render app

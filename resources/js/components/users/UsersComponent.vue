@@ -40,12 +40,15 @@
                                     <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(user)">
                                         <i class="fa fa-edit blue"></i>
                                     </button>
-
                                     <button type="button" class="btn btn-danger btn-sm"
                                             v-on:click="deleteUser(user.id)">
                                         <i class="fa fa-trash red"></i>
                                     </button>
-
+                                    <router-link :to="{name:'user',params:{id:user.id}}">
+                                        <button type="button" class="btn btn-success btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </router-link>
                                 </td>
                             </tr>
                             </tbody>
@@ -121,8 +124,12 @@
 </template>
 
 <script>
+    import rolesViewComponent from '../roles/RolesModalComponent'
     export default {
-        data() {
+    components: {
+        rolesViewComponent
+    },
+    data() {
             return {
                 editmode: false,
                 users: [],
