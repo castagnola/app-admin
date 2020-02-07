@@ -43,6 +43,10 @@ export default new VueRouter({
             path: '/vehicles',
             component: require('./components/vehicles/VehiclesComponent').default
         },
+        {
+            path: '/cities',
+            component: require('./components/cities/CitiesComponent').default
+        },
 
         {
             path: '*',

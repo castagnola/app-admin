@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\ResourceController;
 
-use App\Models\Owner;
+use App\Models\Driver;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class OwnersController extends Controller
+class DriversController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth:api');
 
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +21,7 @@ class OwnersController extends Controller
      */
     public function index()
     {
-        return Owner::all();
+        return Driver::all();
     }
 
     /**
@@ -36,7 +37,7 @@ class OwnersController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -50,24 +51,24 @@ class OwnersController extends Controller
             'phone_number' => 'required|max:10',
         ]);
 
-        $owner = new Owner();
-        $owner->identification_number = $request->identification_number;
-        $owner->first_name = $request->first_name;
-        $owner->second_name = $request->second_name;
-        $owner->last_name = $request->last_name;
-        $owner->address = $request->address;
-        $owner->phone_number = $request->phone_number;
-        $owner->city_id = 1;
-        $owner->status = 1;
-        $owner->save();
+        $driver = new Driver();
+        $driver->identification_number = $request->identification_number;
+        $driver->first_name = $request->first_name;
+        $driver->second_name = $request->second_name;
+        $driver->last_name = $request->last_name;
+        $driver->address = $request->address;
+        $driver->phone_number = $request->phone_number;
+        $driver->city_id = 1;
+        $driver->status = 1;
+        $driver->save();
 
-        return $owner;
+        return $driver;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -78,7 +79,7 @@ class OwnersController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -89,8 +90,8 @@ class OwnersController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -102,33 +103,33 @@ class OwnersController extends Controller
             'last_name' => 'required|string|max:50',
             'address' => 'required|string|max:50',
             'phone_number' => 'required|max:10',
-            'city_id'=>'required'
+            'city_id' => 'required'
         ]);
 
-        $owner = Owner::find($id);
-        $owner->identification_number = $request->identification_number;
-        $owner->first_name = $request->first_name;
-        $owner->second_name = $request->second_name;
-        $owner->last_name = $request->last_name;
-        $owner->address = $request->address;
-        $owner->phone_number = $request->phone_number;
-        $owner->city_id = $request->city_id;
-        $owner->update();
+        $driver = Driver::find($id);
+        $driver->identification_number = $request->identification_number;
+        $driver->first_name = $request->first_name;
+        $driver->second_name = $request->second_name;
+        $driver->last_name = $request->last_name;
+        $driver->address = $request->address;
+        $driver->phone_number = $request->phone_number;
+        $driver->city_id = 1;
+        $driver->update();
 
-        return $owner;
+        return $driver;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        $owner = Owner::findOrFail($id);
-        // delete soft
-        $owner->status = 0;
-        $owner->save();
+        $driver = Driver::find($id);
+        $driver->status = 0;
+        $driver->save();
+
     }
 }

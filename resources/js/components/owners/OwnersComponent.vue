@@ -26,6 +26,7 @@
                                 <th>Phone Number</th>
                                 <th>City</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -146,7 +147,6 @@
         </div>
 
     </div>
-
 </template>
 
 <script>

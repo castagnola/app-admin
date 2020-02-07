@@ -95,8 +95,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
-
                         <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <router-link to="/cities" class="nav-link">
+                                    <i class="fas fa-city"></i>
+                                    <p>Cities</p>
+                                </router-link>
+                            </li>
                             <li class="nav-item">
                                 <router-link to="/roles" class="nav-link">
                                     <i class="fas fa-user-tag"></i>

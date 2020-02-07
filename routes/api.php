@@ -32,3 +32,4 @@ Route::put('profile','API\UserController@updateProfile');
 Route::resource('get-roles','ResourceController\RolesController');
 Route::resource('owners','ResourceController\OwnersController');
 Route::resource('cities','ResourceController\CitiesController');
+Route::resource('drivers','ResourceController\DriversController');

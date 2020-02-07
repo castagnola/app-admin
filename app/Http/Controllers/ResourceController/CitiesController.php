@@ -8,6 +8,11 @@ use App\Http\Controllers\Controller;
 
 class CitiesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+
+    }
     /**
      * Display a listing of the resource.
      *
@@ -36,7 +41,15 @@ class CitiesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'city_name' => 'required|string|',
+        ]);
+
+        $city= new City();
+        $city->city_name = $request->city_name;
+        $city->save();
+
+        return $city;
     }
 
     /**
