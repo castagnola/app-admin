@@ -176,14 +176,14 @@
             loadDrivers() {
                 axios.get(`api/drivers`)
                     .then((res) => {
-                        this.owners = res.data
+                        this.drivers = res.data
                     })
             },
             /**
              * Load all cities
              */
             loadCities() {
-                axios.get(`api/drivers`)
+                axios.get(`api/cities`)
                     .then((res) => {
                         this.cities = res.data
                     })
@@ -289,7 +289,7 @@
             });
             //event
             vm.$on('afterUpdate', (res) => {
-                const index = this.owners.findIndex(itemSearch => itemSearch.id === res.data.id);
+                const index = this.drivers.findIndex(itemSearch => itemSearch.id === res.data.id);
                 this.drivers[index].identification_number = res.data.identification_number;
                 this.drivers[index].first_name = res.data.first_name;
                 this.drivers[index].last_name = res.data.last_name;

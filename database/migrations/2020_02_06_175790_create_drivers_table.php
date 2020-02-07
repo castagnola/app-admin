@@ -20,7 +20,7 @@ class CreateDriversTable extends Migration
             $table->string('second_name',200);
             $table->string('last_name',200);
             $table->string('address',255);
-            $table->integer('phone_number');
+            $table->string('phone_number',200);
             $table->integer('city_id')->unsigned();
             $table->foreign('city_id')->references('id')->on('cities');
             $table->tinyInteger('status')->default(1);

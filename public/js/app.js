@@ -2285,7 +2285,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this = this;
 
       axios.get("api/drivers").then(function (res) {
-        _this.owners = res.data;
+        _this.drivers = res.data;
       });
     },
 
@@ -2295,7 +2295,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     loadCities: function loadCities() {
       var _this2 = this;
 
-      axios.get("api/drivers").then(function (res) {
+      axios.get("api/cities").then(function (res) {
         _this2.cities = res.data;
       });
     },
@@ -2395,7 +2395,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }); //event
 
     vm.$on('afterUpdate', function (res) {
-      var index = _this4.owners.findIndex(function (itemSearch) {
+      var index = _this4.drivers.findIndex(function (itemSearch) {
         return itemSearch.id === res.data.id;
       });
 
@@ -3402,8 +3402,255 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: "VehiclesComponent"
+  name: "VehiclesComponent",
+  data: function data() {
+    return {
+      editmode: false,
+      vehicles: [],
+      owners: [],
+      drivers: [],
+      tipes: [],
+      form: new Form({
+        id: '',
+        color: '',
+        placa: '',
+        brand: '',
+        tipe_vehicle: '',
+        owner_id: '',
+        driver_id: '',
+        tipe_id: ''
+      })
+    };
+  },
+  methods: {
+    /**
+     * Load all drivers
+     */
+    loadAllVehicles: function loadAllVehicles() {
+      var _this = this;
+
+      axios.get("api/vehicle").then(function (res) {
+        _this.vehicles = res.data;
+      });
+    },
+
+    /**
+     *Create user
+     */
+    createUser: function createUser() {
+      this.editmode = false;
+      this.form.post('api/vehicle').then(function () {
+        vm.$emit('afterCreate');
+        $('#addUser').modal('hide');
+        toast.fire('Success!', 'Vehicle Created in successfully.', 'success');
+      })["catch"](function () {
+        toast.fire('Uops!', 'Complete all fields!', 'warning');
+      });
+    },
+
+    /**
+     * update informatio vehicle
+     */
+    updateUser: function updateUser() {
+      console.log(this.form); // console.log('Editing data');
+
+      this.form.put('api/vehicle/' + this.form.id).then(function (res) {
+        // success
+        $('#addUser').modal('hide');
+        toast.fire('Updated!', 'Vehicle: ' + res.data.placa.toUpperCase() + ' has been updated.', 'success');
+        vm.$emit('afterUpdate', res);
+      })["catch"](function () {
+        toast.fire('Error!', 'There was something wronge.', 'error');
+      });
+    },
+
+    /**
+     * Change status user
+     * @param id
+     */
+    deleteUser: function deleteUser(id) {
+      var _this2 = this;
+
+      swal.fire({
+        title: 'Are you sure?',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Delete'
+      }).then(function (result) {
+        // Send request to the server
+        if (result.value) {
+          _this2.form["delete"]('api/vehicle/' + id).then(function () {
+            toast.fire('Success!', 'Vehicle has been deleted.', 'success');
+            vm.$emit('afterCreate');
+          })["catch"](function () {
+            toast.fire('Error!', 'There was something wronge.', 'error');
+          });
+        }
+      });
+    },
+
+    /**
+     * Show and complete user info
+     * @param user
+     */
+    editModal: function editModal(user) {
+      this.editmode = true;
+      this.form.reset();
+      this.form.clear();
+      $('#addUser').modal('show');
+      this.form.fill(user);
+    },
+
+    /**
+     * Show modal to create new user
+     */
+    newModal: function newModal() {
+      this.editmode = false;
+      this.form.reset();
+      this.form.clear();
+      $('#addUser').modal('show');
+    },
+
+    /**
+     * Show all Vehicles
+     */
+    loadVehicles: function loadVehicles() {
+      var _this3 = this;
+
+      axios.get("api/tipe-vehicles").then(function (res) {
+        _this3.tipes = res.data;
+      });
+    },
+
+    /**
+     * Load all owners
+     */
+    loadOwners: function loadOwners() {
+      var _this4 = this;
+
+      axios.get("api/owners").then(function (res) {
+        _this4.owners = res.data;
+      });
+    },
+
+    /**
+     * Load all drivers
+     */
+    loadDrivers: function loadDrivers() {
+      var _this5 = this;
+
+      axios.get("api/drivers").then(function (res) {
+        _this5.drivers = res.data;
+      });
+    }
+  },
+
+  /**
+   * Methods first charge
+   */
+  created: function created() {
+    var _this6 = this;
+
+    this.loadVehicles();
+    this.loadDrivers();
+    this.loadOwners();
+    this.loadAllVehicles();
+    vm.$on('afterCreate', function () {
+      _this6.loadVehicles();
+    }); //event
+
+    vm.$on('afterUpdate', function (res) {
+      var index = _this6.vehicles.findIndex(function (itemSearch) {
+        return itemSearch.id === res.data.id;
+      });
+
+      _this6.vehicles[index].color = res.data.color;
+      _this6.vehicles[index].placa = res.data.placa;
+    });
+  }
 });
 
 /***/ }),
@@ -63688,7 +63935,9 @@ var render = function() {
         [
           _c("div", { staticClass: "card" }, [
             _c("div", { staticClass: "card-header" }, [
-              _c("h3", { staticClass: "card-title" }, [_vm._v("User List")]),
+              _c("h3", { staticClass: "card-title" }, [
+                _vm._v("Vehicles List")
+              ]),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
                 _vm.$gate.isAdmin()
@@ -63707,18 +63956,537 @@ var render = function() {
                         _vm._v(
                           "Add\n                            new\n                            "
                         ),
-                        _c("i", { staticClass: "fas fa-user-plus" })
+                        _c("i", { staticClass: "fas fa-car" })
                       ]
                     )
                   : _vm._e()
               ])
             ]),
             _vm._v(" "),
-            _vm._m(0)
+            _c("div", { staticClass: "card-body table-responsive p-0" }, [
+              _c("table", { staticClass: "table table-hover" }, [
+                _vm._m(0),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  _vm._l(_vm.vehicles, function(vehicle) {
+                    return _c("tr", { key: vehicle.id }, [
+                      _c("td", [_vm._v(_vm._s(vehicle.color))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(vehicle.placa))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(vehicle.brand))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(vehicle.tipe_id))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(vehicle.driver_id))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(vehicle.owner_id))]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(vehicle.status === 1 ? "Activo" : "Desactivo")
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary btn-sm",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                return _vm.editModal(vehicle)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fa fa-edit blue" })]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger btn-sm",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteUser(vehicle.id)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fa fa-trash red" })]
+                        )
+                      ])
+                    ])
+                  }),
+                  0
+                )
+              ])
+            ])
           ])
         ]
       )
-    ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "addUser",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "addUserLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-dialog-centered",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c(
+                  "h5",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.editmode,
+                        expression: "!editmode"
+                      }
+                    ],
+                    staticClass: "modal-title",
+                    attrs: { id: "addUserLabel" }
+                  },
+                  [_vm._v("Add New "), _c("i", { staticClass: "fas fa-user" })]
+                ),
+                _vm._v(" "),
+                _c(
+                  "h5",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.editmode,
+                        expression: "editmode"
+                      }
+                    ],
+                    staticClass: "modal-title",
+                    attrs: { id: "addUserLabel" }
+                  },
+                  [
+                    _vm._v("Update User "),
+                    _c("i", { staticClass: "fas fa-user" })
+                  ]
+                ),
+                _vm._v(" "),
+                _vm._m(1)
+              ]),
+              _vm._v(" "),
+              _c(
+                "form",
+                {
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      _vm.editmode ? _vm.updateUser() : _vm.createUser()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.color,
+                              expression: "form.color"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          class: { "is-invalid": _vm.form.errors.has("color") },
+                          attrs: {
+                            type: "text",
+                            name: "color",
+                            placeholder: "Color"
+                          },
+                          domProps: { value: _vm.form.color },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(_vm.form, "color", $event.target.value)
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "color" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.placa,
+                              expression: "form.placa"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          class: { "is-invalid": _vm.form.errors.has("placa") },
+                          attrs: {
+                            type: "text",
+                            name: "placa",
+                            placeholder: "Placa"
+                          },
+                          domProps: { value: _vm.form.placa },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(_vm.form, "placa", $event.target.value)
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "placa" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.brand,
+                              expression: "form.brand"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          class: { "is-invalid": _vm.form.errors.has("brand") },
+                          attrs: {
+                            type: "text",
+                            name: "brand",
+                            placeholder: "brand"
+                          },
+                          domProps: { value: _vm.form.brand },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(_vm.form, "brand", $event.target.value)
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "brand" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.tipe_id,
+                                expression: "form.tipe_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.form.errors.has("tipe_id")
+                            },
+                            attrs: { name: "tipe_id", id: "tipe_id" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "tipe_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c(
+                              "option",
+                              {
+                                attrs: { value: "", disabled: "", selected: "" }
+                              },
+                              [_vm._v("Select Type Vehicle")]
+                            ),
+                            _vm._v(" "),
+                            _vm._l(_vm.tipes, function(tipe, key) {
+                              return _c(
+                                "option",
+                                { domProps: { value: tipe.id } },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(tipe.description) +
+                                      "\n                                "
+                                  )
+                                ]
+                              )
+                            })
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "tipe_id" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.owner_id,
+                                expression: "form.owner_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.form.errors.has("owner_id")
+                            },
+                            attrs: { name: "role_id", id: "owner_id" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "owner_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c(
+                              "option",
+                              {
+                                attrs: { value: "", disabled: "", selected: "" }
+                              },
+                              [_vm._v("Select Owner")]
+                            ),
+                            _vm._v(" "),
+                            _vm._l(_vm.owners, function(owner, key) {
+                              return _c(
+                                "option",
+                                { domProps: { value: owner.id } },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(owner.first_name) +
+                                      "\n                                "
+                                  )
+                                ]
+                              )
+                            })
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "owner_id" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.driver_id,
+                                expression: "form.driver_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.form.errors.has("driver_id")
+                            },
+                            attrs: { name: "driver_id", id: "driver_id" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "driver_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c(
+                              "option",
+                              {
+                                attrs: { value: "", disabled: "", selected: "" }
+                              },
+                              [_vm._v("Select Driver")]
+                            ),
+                            _vm._v(" "),
+                            _vm._l(_vm.drivers, function(driver, key) {
+                              return _c(
+                                "option",
+                                { domProps: { value: driver.id } },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(driver.first_name) +
+                                      "\n                                "
+                                  )
+                                ]
+                              )
+                            })
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "driver_id" }
+                        })
+                      ],
+                      1
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _vm._m(2),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: _vm.editmode,
+                            expression: "editmode"
+                          }
+                        ],
+                        staticClass: "btn btn-success",
+                        attrs: { type: "submit" }
+                      },
+                      [
+                        _vm._v("Save "),
+                        _c("i", { staticClass: "fas fa-check" })
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: !_vm.editmode,
+                            expression: "!editmode"
+                          }
+                        ],
+                        staticClass: "btn btn-success",
+                        attrs: { type: "submit" }
+                      },
+                      [
+                        _vm._v("Create "),
+                        _c("i", { staticClass: "fas fa-plus" })
+                      ]
+                    )
+                  ])
+                ]
+              )
+            ])
+          ]
+        )
+      ]
+    )
   ])
 }
 var staticRenderFns = [
@@ -63726,69 +64494,55 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card-body table-responsive p-0" }, [
-      _c("table", { staticClass: "table table-hover" }, [
-        _c("thead", [
-          _c("tr", [
-            _c("th", [_vm._v("Color")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Placa")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Brand")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Tipe Vehicle")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Driver")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Owner")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Status")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Action")])
-          ])
-        ]),
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Color")]),
         _vm._v(" "),
-        _c("tbody", [
-          _c("tr", [
-            _c("td", [_vm._v("Color")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("Placa")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("Brand")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("Tipe Vehicle")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("Driver")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("Owner")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("Status")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("Action")]),
-            _vm._v(" "),
-            _c("td", [
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-primary btn-sm",
-                  attrs: { type: "button" }
-                },
-                [_c("i", { staticClass: "fa fa-edit blue" })]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-danger btn-sm",
-                  attrs: { type: "button" }
-                },
-                [_c("i", { staticClass: "fa fa-trash red" })]
-              )
-            ])
-          ])
-        ])
+        _c("th", [_vm._v("Placa")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Brand")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Tipe Vehicle")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Driver")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Owner")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Status")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Action")])
       ])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "modal",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-danger",
+        attrs: { type: "button", "data-dismiss": "modal" }
+      },
+      [_vm._v("Close "), _c("i", { staticClass: "fas fa-times" })]
+    )
   }
 ]
 render._withStripped = true
