@@ -19,13 +19,15 @@
                             <thead>
                             <tr>
                                 <th>City Name</th>
+                                <th>Departament</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="city in cities" :key="city.id">
+                            <tr v-for="city in cities.data" :key="city.id">
                                 <td>{{city.city_name}}</td>
+                                <td>{{city.departament.departament_name}}</td>
                                 <td>{{city.status === 1 ? 'Activo' : 'Desactivo'}}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(owner)">
@@ -40,6 +42,10 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- pagination --->
+                    <div class="card-footer">
+                        <pagination :data="cities" @pagination-change-page="getResults"></pagination>
+                    </div>
                 </div>
             </div>
         </div>
@@ -51,10 +57,10 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" v-show="!editmode" id="addOwnersLabel">Add New <i
-                            class="fas fa-city"></i>
+                                class="fas fa-city"></i>
                         </h5>
                         <h5 class="modal-title" v-show="editmode" id="addOwnersLabel">Update Owner <i
-                            class="fas fa-city"></i></h5>
+                                class="fas fa-city"></i></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -72,19 +78,16 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close <i
-                                class="fas fa-times"></i></button>
+                                    class="fas fa-times"></i></button>
                             <button v-show="editmode" type="submit" class="btn btn-success">Save <i
-                                class="fas fa-check"></i></button>
+                                    class="fas fa-check"></i></button>
                             <button v-show="!editmode" type="submit" class="btn btn-success">Create <i
-                                class="fas fa-plus"></i></button>
+                                    class="fas fa-plus"></i></button>
                         </div>
-
                     </form>
-
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -93,20 +96,28 @@
         name: "CitiesComponent",
         data() {
             return {
-                cities: [],
+                cities: {},
                 editmode: false,
                 form: new Form({
                     id: '',
                     city_name: '',
+                    departament:[],
                 })
             }
         },
         methods: {
+            getResults(page = 1) {
+                axios.get('api/city?page=' + page)
+                    .then(response => {
+                        this.cities = response.data;
+                    });
+            },
+
             /**
              * Load all cities
              */
             loadCities() {
-                axios.get(`api/cities`)
+                axios.get(`api/city`)
                     .then((res) => {
                         this.cities = res.data
                     })
@@ -127,7 +138,7 @@
              */
             create() {
                 this.editmode = false;
-                this.form.post('api/cities')
+                this.form.post('api/city')
                     .then(() => {
                         vm.$emit('afterCreate');
                         $('#addOwners').modal('hide')
@@ -142,7 +153,7 @@
              * Update  City
              */
             update() {
-                this.form.put('api/cities/' + this.form.id)
+                this.form.put('api/city/' + this.form.id)
                     .then((res) => {
                         // success
                         $('#addOwners').modal('hide');

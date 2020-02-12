@@ -47,7 +47,10 @@ export default new VueRouter({
             path: '/cities',
             component: require('./components/cities/CitiesComponent').default
         },
-
+        {
+            path: '/reportes',
+            component: require('./components/pdf/PdfComponent').default
+        },
         {
             path: '*',
             component: require('./views/404').default,

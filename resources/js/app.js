@@ -23,6 +23,7 @@ import Vue from 'vue'
 
 Vue.component(AlertError.name, AlertError)
 Vue.component(HasError.name, HasError)
+Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.prototype.$gate = new Gate(window.user);
 
 window.swal = swal;

@@ -24,3 +24,9 @@ Route::get('/home', 'HomeController@index')->name('home');
  */
 Route::get('login/{service}','Auth\LoginController@redirectToProvider');
 Route::get('login/{service}/callback','Auth\LoginController@handleProviderCallback');
+
+/**
+ * PDF Route
+ */
+
+Route::name('imprimir')->get('/imprimir-pdf','Controller@imprimir');

@@ -126,6 +126,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     <p>Drivers</p>
                                 </router-link>
                             </li>
+                            <li class="nav-item">
+                                <router-link to="/reportes" class="nav-link">
+                                    <i class="fas fa-file"></i>
+                                    <p>Reporte</p>
+                                </router-link>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ResourceController;
 use App\Models\City;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class CitiesController extends Controller
 {
@@ -20,7 +21,7 @@ class CitiesController extends Controller
      */
     public function index()
     {
-       return City::all();
+       return City::with('departament')->paginate(5);
     }
 
     /**

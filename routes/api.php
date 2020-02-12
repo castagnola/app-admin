@@ -31,7 +31,7 @@ Route::put('profile','API\UserController@updateProfile');
 
 Route::resource('get-roles','ResourceController\RolesController');
 Route::resource('owners','ResourceController\OwnersController');
-Route::resource('cities','ResourceController\CitiesController');
+Route::resource('city','ResourceController\CitiesController');
 Route::resource('drivers','ResourceController\DriversController');
 Route::resource('tipe-vehicles','ResourceController\TipeVehiclesController');
 Route::resource('vehicle','ResourceController\VehiclesController');
