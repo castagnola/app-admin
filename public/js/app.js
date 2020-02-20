@@ -1983,16 +1983,33 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "CitiesComponent",
   data: function data() {
     return {
       cities: {},
+      departaments: [],
       editmode: false,
       form: new Form({
         id: '',
         city_name: '',
-        departament: []
+        departament_id: '',
+        departament: [],
+        status: ''
       })
     };
   },
@@ -2001,8 +2018,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      axios.get('api/city?page=' + page).then(function (response) {
+      axios.get('api/get-city-paginate?page=' + page).then(function (response) {
         _this.cities = response.data;
+      });
+    },
+
+    /**
+     * Load all Departments
+     */
+    loadDepartaments: function loadDepartaments() {
+      var _this2 = this;
+
+      axios.get("api/department").then(function (res) {
+        _this2.departaments = res.data;
       });
     },
 
@@ -2010,10 +2038,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      * Load all cities
      */
     loadCities: function loadCities() {
-      var _this2 = this;
+      var _this3 = this;
 
-      axios.get("api/city").then(function (res) {
-        _this2.cities = res.data;
+      axios.get("api/get-city-paginate").then(function (res) {
+        _this3.cities = res.data;
       });
     },
 
@@ -2048,7 +2076,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.form.put('api/city/' + this.form.id).then(function (res) {
         // success
         $('#addOwners').modal('hide');
-        toast.fire('Updated!', 'User: ' + res.data.first_name.toUpperCase() + ' has been updated.', 'success');
+        toast.fire('Updated!', 'City: ' + res.data.city_name.toUpperCase() + ' has been updated.', 'success');
         vm.$emit('afterUpdate', res);
       })["catch"](function () {
         toast.fire('Error!', 'There was something wronge.', 'error');
@@ -2060,20 +2088,45 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      * @param id
      */
     deleteCity: function deleteCity(id) {
-      var _this3 = this;
+      var _this4 = this;
 
       swal.fire({
-        title: 'Are you sure?',
+        title: 'Do you want to continue?',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Delete'
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Delete',
+        reverseButtons: true
       }).then(function (result) {
         // Send request to the server
         if (result.value) {
-          _this3.form["delete"]('api/owners/' + id).then(function () {
+          _this4.form["delete"]('api/city/' + id).then(function () {
             toast.fire('Success!', 'User has been deleted.', 'success');
             vm.$emit('afterCreate');
+          })["catch"](function () {
+            toast.fire('Error!', 'There was something wronge.', 'error');
+          });
+        }
+      });
+    },
+
+    /**
+     * Active de row of city
+     * @param id
+     */
+    activeCity: function activeCity(id) {
+      swal.fire({
+        title: 'Do you want to continue?',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirm',
+        reverseButtons: true
+      }).then(function (result) {
+        if (result.value) {
+          axios.get("api/city/".concat(id, "/edit")).then(function (res) {
+            toast.fire('Actived!', 'City: ' + res.data.city_name.toUpperCase() + ' has been actived.', 'success');
+            vm.$emit('afterUpdate', res);
           })["catch"](function () {
             toast.fire('Error!', 'There was something wronge.', 'error');
           });
@@ -2103,19 +2156,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
    * Methods first charge
    */
   created: function created() {
-    var _this4 = this;
+    var _this5 = this;
 
     this.loadCities();
+    this.loadDepartaments(); //event
+
     vm.$on('afterCreate', function () {
-      _this4.loadCities();
-    }); //event
-
+      _this5.loadCities();
+    });
     vm.$on('afterUpdate', function (res) {
-      var index = _this4.cities.findIndex(function (itemSearch) {
-        return itemSearch.id === res.data.id;
-      });
+      console.log(res.data);
 
-      _this4.cities[index].city_name = res.data.cities.city_name;
+      for (var i = 0; i < _this5.cities.data.length; i++) {
+        if (_this5.cities.data[i].id === res.data.id) {
+          _this5.cities.data[i].city_name = res.data.city_name;
+          _this5.cities.data[i].departament.departament_name = res.data.departament.departament_name;
+          _this5.cities.data[i].status = res.data.status;
+        }
+      }
     });
   }
 });
@@ -2320,8 +2378,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     loadCities: function loadCities() {
       var _this2 = this;
 
-      axios.get("api/cities").then(function (res) {
-        _this2.cities = res.data;
+      axios.get("api/city").then(function (res) {
+        _this2.cities = res.data.data;
       });
     },
 
@@ -62731,26 +62789,24 @@ var render = function() {
               _c("h3", { staticClass: "card-title" }, [_vm._v("Cities List")]),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
-                _vm.$gate.isAdmin()
-                  ? _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-block btn-outline-success",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            return _vm.newModal()
-                          }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "Add\n                            new\n                            "
-                        ),
-                        _c("i", { staticClass: "fas fa-city" })
-                      ]
-                    )
-                  : _vm._e()
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-block btn-outline-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.newModal()
+                      }
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "Add\n                            new\n                            "
+                    ),
+                    _c("i", { staticClass: "fas fa-city" })
+                  ]
+                )
               ])
             ]),
             _vm._v(" "),
@@ -62775,33 +62831,53 @@ var render = function() {
                       ]),
                       _vm._v(" "),
                       _c("td", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.editModal(_vm.owner)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-edit blue" })]
-                        ),
+                        city.status
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.editModal(city)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "fa fa-edit blue" })]
+                            )
+                          : _vm._e(),
                         _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.deleteCity(_vm.owner.id)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-trash red" })]
-                        )
+                        city.status
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-danger btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.deleteCity(city.id)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "fa fa-trash red" })]
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
+                        !city.status
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-success btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.activeCity(city.id)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "fas fa-exclamation" })]
+                            )
+                          : _vm._e()
                       ])
                     ])
                   }),
@@ -62880,7 +62956,7 @@ var render = function() {
                     attrs: { id: "addOwnersLabel" }
                   },
                   [
-                    _vm._v("Update Owner "),
+                    _vm._v("Update City "),
                     _c("i", { staticClass: "fas fa-city" })
                   ]
                 ),
@@ -62939,6 +63015,84 @@ var render = function() {
                         _vm._v(" "),
                         _c("has-error", {
                           attrs: { form: _vm.form, field: "city_name" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.departament_id,
+                                expression: "form.departament_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.form.errors.has(
+                                "departament_id"
+                              )
+                            },
+                            attrs: { name: "driver_id", id: "departament_id" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "departament_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c(
+                              "option",
+                              {
+                                attrs: { value: "", disabled: "", selected: "" }
+                              },
+                              [_vm._v("Select Departament")]
+                            ),
+                            _vm._v(" "),
+                            _vm._l(_vm.departaments, function(
+                              departament,
+                              key
+                            ) {
+                              return _c(
+                                "option",
+                                { domProps: { value: departament.id } },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(departament.departament_name) +
+                                      "\n                                "
+                                  )
+                                ]
+                              )
+                            })
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "departament_id" }
                         })
                       ],
                       1
@@ -63074,35 +63228,33 @@ var render = function() {
         [
           _c("div", { staticClass: "card" }, [
             _c("div", { staticClass: "card-header" }, [
-              _c("h3", { staticClass: "card-title" }, [_vm._v("Driver List")]),
+              _vm._m(0),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
-                _vm.$gate.isAdmin()
-                  ? _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-block btn-outline-success",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            return _vm.newModal()
-                          }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "Add\n                            new\n                            "
-                        ),
-                        _c("i", { staticClass: "fas fa-user-plus" })
-                      ]
-                    )
-                  : _vm._e()
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-block btn-outline-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.newModal()
+                      }
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "Add\n                            new\n                            "
+                    ),
+                    _c("i", { staticClass: "fas fa-user-plus" })
+                  ]
+                )
               ])
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "card-body table-responsive p-0" }, [
               _c("table", { staticClass: "table table-hover" }, [
-                _vm._m(0),
+                _vm._m(1),
                 _vm._v(" "),
                 _c(
                   "tbody",
@@ -63227,7 +63379,7 @@ var render = function() {
                   ]
                 ),
                 _vm._v(" "),
-                _vm._m(1)
+                _vm._m(2)
               ]),
               _vm._v(" "),
               _c(
@@ -63582,7 +63734,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-footer" }, [
-                    _vm._m(2),
+                    _vm._m(3),
                     _vm._v(" "),
                     _c(
                       "button",
@@ -63634,6 +63786,15 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "card-title" }, [
+      _c("i", { staticClass: "fas fa-user-alt-slash" }),
+      _vm._v(" Driver List")
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -63720,35 +63881,33 @@ var render = function() {
         [
           _c("div", { staticClass: "card" }, [
             _c("div", { staticClass: "card-header" }, [
-              _c("h3", { staticClass: "card-title" }, [_vm._v("Owners List")]),
+              _vm._m(0),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
-                _vm.$gate.isAdmin()
-                  ? _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-block btn-outline-success",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            return _vm.newModal()
-                          }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "Add\n                            new\n                            "
-                        ),
-                        _c("i", { staticClass: "fas fa-user-plus" })
-                      ]
-                    )
-                  : _vm._e()
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-block btn-outline-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.newModal()
+                      }
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "Add\n                            new\n                            "
+                    ),
+                    _c("i", { staticClass: "fas fa-user-plus" })
+                  ]
+                )
               ])
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "card-body table-responsive p-0" }, [
               _c("table", { staticClass: "table table-hover" }, [
-                _vm._m(0),
+                _vm._m(1),
                 _vm._v(" "),
                 _c(
                   "tbody",
@@ -63873,7 +64032,7 @@ var render = function() {
                   ]
                 ),
                 _vm._v(" "),
-                _vm._m(1)
+                _vm._m(2)
               ]),
               _vm._v(" "),
               _c(
@@ -64228,7 +64387,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-footer" }, [
-                    _vm._m(2),
+                    _vm._m(3),
                     _vm._v(" "),
                     _c(
                       "button",
@@ -64280,6 +64439,15 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "card-title" }, [
+      _c("i", { staticClass: "fas fa-user-tie" }),
+      _vm._v(" Owners List ")
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -64724,24 +64892,22 @@ var render = function() {
               _c("h3", { staticClass: "card-title" }, [_vm._v("Roles List")]),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
-                _vm.$gate.isAdmin()
-                  ? _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-block btn-outline-success",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            return _vm.newModal()
-                          }
-                        }
-                      },
-                      [
-                        _vm._v("Add new\n                            "),
-                        _c("i", { staticClass: "fas fa-user-plus" })
-                      ]
-                    )
-                  : _vm._e()
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-block btn-outline-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.newModal()
+                      }
+                    }
+                  },
+                  [
+                    _vm._v("Add new\n                            "),
+                    _c("i", { staticClass: "fas fa-user-plus" })
+                  ]
+                )
               ])
             ]),
             _vm._v(" "),
@@ -64775,7 +64941,9 @@ var render = function() {
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(role.description))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(role.created_at))]),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("myDate")(role.created_at)))
+                      ]),
                       _vm._v(" "),
                       _c("td", [
                         _vm._v(
@@ -64883,26 +65051,24 @@ var render = function() {
               _c("h3", { staticClass: "card-title" }, [_vm._v("User List")]),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
-                _vm.$gate.isAdmin()
-                  ? _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-block btn-outline-success",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            return _vm.newModal()
-                          }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "Add\n                            new\n                            "
-                        ),
-                        _c("i", { staticClass: "fas fa-user-plus" })
-                      ]
-                    )
-                  : _vm._e()
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-block btn-outline-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.newModal()
+                      }
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "Add\n                            new\n                            "
+                    ),
+                    _c("i", { staticClass: "fas fa-user-plus" })
+                  ]
+                )
               ])
             ]),
             _vm._v(" "),
@@ -64931,7 +65097,13 @@ var render = function() {
                       ]),
                       _vm._v(" "),
                       _c("td", [
-                        _vm._v(_vm._s(_vm._f("myDate")(user.created_at)))
+                        _vm._v(
+                          _vm._s(
+                            _vm._f("myDate")(
+                              user.created_at === null ? "N/A" : user.created_at
+                            )
+                          )
+                        )
                       ]),
                       _vm._v(" "),
                       _c(
@@ -65406,26 +65578,24 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
-                _vm.$gate.isAdmin()
-                  ? _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-block btn-outline-success",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            return _vm.newModal()
-                          }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "Add\n                            new\n                            "
-                        ),
-                        _c("i", { staticClass: "fas fa-car" })
-                      ]
-                    )
-                  : _vm._e()
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-block btn-outline-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.newModal()
+                      }
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "Add\n                            new\n                            "
+                    ),
+                    _c("i", { staticClass: "fas fa-car" })
+                  ]
+                )
               ])
             ]),
             _vm._v(" "),
@@ -81264,7 +81434,7 @@ vue__WEBPACK_IMPORTED_MODULE_5___default.a.filter('upText', function (text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 });
 vue__WEBPACK_IMPORTED_MODULE_5___default.a.filter('myDate', function (created) {
-  return moment__WEBPACK_IMPORTED_MODULE_4___default()(created).format('MMMM Do YYYY');
+  return moment__WEBPACK_IMPORTED_MODULE_4___default()(created).isValid() ? moment__WEBPACK_IMPORTED_MODULE_4___default()(created).format('MMMM Do YYYY') : 'N/A';
 }); // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
 /**

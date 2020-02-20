@@ -35,3 +35,9 @@ Route::resource('city','ResourceController\CitiesController');
 Route::resource('drivers','ResourceController\DriversController');
 Route::resource('tipe-vehicles','ResourceController\TipeVehiclesController');
 Route::resource('vehicle','ResourceController\VehiclesController');
+Route::resource('department','ResourceController\DepartmentsController');
+
+/**
+ * Api Custom Routes
+ */
+Route::get('get-city-paginate','CustomController\CitiesController@index');

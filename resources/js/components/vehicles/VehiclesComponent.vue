@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Vehicles List</h3>
                         <div class="card-tools">
-                            <button v-if="$gate.isAdmin()" type="button" class="btn btn-block btn-outline-success"
+                            <button type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add
                                 new
                                 <i class="fas fa-car"></i>

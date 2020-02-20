@@ -4,9 +4,9 @@
             <div style="margin-top: 10px" class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Driver List</h3>
+                        <h3 class="card-title"> <i class="fas fa-user-alt-slash"></i> Driver List</h3>
                         <div class="card-tools">
-                            <button v-if="$gate.isAdmin()" type="button" class="btn btn-block btn-outline-success"
+                            <button type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add
                                 new
                                 <i class="fas fa-user-plus"></i>
@@ -183,9 +183,9 @@
              * Load all cities
              */
             loadCities() {
-                axios.get(`api/cities`)
+                axios.get(`api/city`)
                     .then((res) => {
-                        this.cities = res.data
+                        this.cities = res.data.data
                     })
             },
 

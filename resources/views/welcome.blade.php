@@ -12,12 +12,11 @@
         <!-- Styles -->
         <style>
             html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Nunito', sans-serif;
-                font-weight: 200;
-                height: 100vh;
-                margin: 0;
+                background-image: url('https://www.portada-online.com/wp-content/uploads/2019/01/laptop-with-glasses.jpg');
+                background-size: cover;
+                background-repeat: no-repeat;
+                height: 100%;
+                font-family: 'Numans', sans-serif;
             }
 
             .full-height {
@@ -49,7 +48,7 @@
             }
 
             .links > a {
-                color: #636b6f;
+                color: #0c525d;
                 padding: 0 25px;
                 font-size: 13px;
                 font-weight: 600;
@@ -76,7 +75,7 @@
         @endif
 
         <div class="content">
-            <div class="title m-b-md">
+            <div class="title m-b-md" style="color: #0c525d">
                 Welcome
             </div>
 

@@ -87,6 +87,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </router-link>
                         </li>
                     @endcan
+                    <li class="nav-item">
+                        <router-link to="/roles" class="nav-link">
+                            <i class=" nav-icon fas fa-user-tag"></i>
+                            <p>Roles</p>
+                        </router-link>
+                    </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-cogs"></i>
@@ -95,6 +101,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
+
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <router-link to="/cities" class="nav-link">
@@ -103,9 +110,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </router-link>
                             </li>
                             <li class="nav-item">
-                                <router-link to="/roles" class="nav-link">
-                                    <i class="fas fa-user-tag"></i>
-                                    <p>Roles</p>
+                                <router-link to="/drivers" class="nav-link">
+                                    <i class="fas fa-user-alt-slash"></i>
+                                    <p>Drivers</p>
                                 </router-link>
                             </li>
                             <li class="nav-item">
@@ -116,14 +123,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </li>
                             <li class="nav-item">
                                 <router-link to="/owners" class="nav-link">
-                                    <i class="fas fa-user-shield"></i>
+                                    <i class="fas fa-user-tie"></i>
                                     <p>Owner</p>
-                                </router-link>
-                            </li>
-                            <li class="nav-item">
-                                <router-link to="/drivers" class="nav-link">
-                                    <i class="fas fa-user-alt-slash"></i>
-                                    <p>Drivers</p>
                                 </router-link>
                             </li>
                             <li class="nav-item">

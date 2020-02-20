@@ -4,9 +4,9 @@
             <div style="margin-top: 10px" class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Owners List</h3>
+                        <h3 class="card-title"><i class="fas fa-user-tie"></i> Owners List </h3>
                         <div class="card-tools">
-                            <button v-if="$gate.isAdmin()" type="button" class="btn btn-block btn-outline-success"
+                            <button type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add
                                 new
                                 <i class="fas fa-user-plus"></i>

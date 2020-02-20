@@ -27,12 +27,13 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.prototype.$gate = new Gate(window.user);
 
 window.swal = swal;
+
 const toast = swal.mixin({
     toast: true,
     position: 'top-end',
     showConfirmButton: false,
     timer: 3000,
-    timerProgressBar: true
+    timerProgressBar: true,
 });
 
 window.toast = toast;
@@ -45,7 +46,8 @@ Vue.filter('upText', function(text){
 });
 
 Vue.filter('myDate',function(created){
-    return moment(created).format('MMMM Do YYYY');
+
+    return moment(created).isValid() ?  moment(created).format('MMMM Do YYYY') : 'N/A';
 });
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);

@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Cities List</h3>
                         <div class="card-tools">
-                            <button v-if="$gate.isAdmin()" type="button" class="btn btn-block btn-outline-success"
+                            <button  type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add
                                 new
                                 <i class="fas fa-city"></i>
@@ -30,12 +30,16 @@
                                 <td>{{city.departament.departament_name}}</td>
                                 <td>{{city.status === 1 ? 'Activo' : 'Desactivo'}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(owner)">
+                                    <button v-if="city.status" type="button" class="btn btn-primary btn-sm" v-on:click="editModal(city)">
                                         <i class="fa fa-edit blue"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm"
-                                            v-on:click="deleteCity(owner.id)">
+                                    <button v-if="city.status" type="button" class="btn btn-danger btn-sm"
+                                            v-on:click="deleteCity(city.id)">
                                         <i class="fa fa-trash red"></i>
+                                    </button>
+                                    <button v-if="!city.status" type="button" class="btn btn-success btn-sm"
+                                            v-on:click="activeCity(city.id)">
+                                        <i class="fas fa-exclamation"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -59,7 +63,7 @@
                         <h5 class="modal-title" v-show="!editmode" id="addOwnersLabel">Add New <i
                                 class="fas fa-city"></i>
                         </h5>
-                        <h5 class="modal-title" v-show="editmode" id="addOwnersLabel">Update Owner <i
+                        <h5 class="modal-title" v-show="editmode" id="addOwnersLabel">Update City <i
                                 class="fas fa-city"></i></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -74,11 +78,21 @@
                                        :class="{ 'is-invalid': form.errors.has('city_name') }">
                                 <has-error :form="form" field="city_name"></has-error>
                             </div>
-
+                            <div class="form-group">
+                                <select name="driver_id" v-model="form.departament_id" id="departament_id" class="form-control"
+                                        :class="{ 'is-invalid': form.errors.has('departament_id') }">
+                                    <option value="" disabled selected>Select Departament</option>
+                                    <option v-for="(departament,key) in departaments" :value="departament.id">
+                                        {{departament.departament_name}}
+                                    </option>
+                                </select>
+                                <has-error :form="form" field="departament_id"></has-error>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close <i
                                     class="fas fa-times"></i></button>
+
                             <button v-show="editmode" type="submit" class="btn btn-success">Save <i
                                     class="fas fa-check"></i></button>
                             <button v-show="!editmode" type="submit" class="btn btn-success">Create <i
@@ -96,28 +110,41 @@
         name: "CitiesComponent",
         data() {
             return {
-                cities: {},
+                cities:{},
+                departaments:[],
                 editmode: false,
                 form: new Form({
                     id: '',
                     city_name: '',
+                    departament_id :'',
                     departament:[],
+                    status:''
                 })
             }
         },
         methods: {
             getResults(page = 1) {
-                axios.get('api/city?page=' + page)
+                axios.get('api/get-city-paginate?page=' + page)
                     .then(response => {
                         this.cities = response.data;
                     });
             },
 
             /**
+             * Load all Departments
+             */
+            loadDepartaments(){
+                axios.get(`api/department`).then((res)=>{
+                    this.departaments = res.data
+                })
+
+            },
+
+            /**
              * Load all cities
              */
             loadCities() {
-                axios.get(`api/city`)
+                axios.get(`api/get-city-paginate`)
                     .then((res) => {
                         this.cities = res.data
                     })
@@ -157,7 +184,7 @@
                     .then((res) => {
                         // success
                         $('#addOwners').modal('hide');
-                        toast.fire('Updated!', 'User: ' + res.data.first_name.toUpperCase() + ' has been updated.', 'success')
+                        toast.fire('Updated!', 'City: ' + res.data.city_name.toUpperCase() + ' has been updated.', 'success')
                         vm.$emit('afterUpdate', res);
                     }).catch(() => {
                     toast.fire('Error!', 'There was something wronge.', 'error')
@@ -170,15 +197,16 @@
              */
             deleteCity(id) {
                 swal.fire({
-                    title: 'Are you sure?',
+                    title: 'Do you want to continue?',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Delete'
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Delete',
+                    reverseButtons: true
                 }).then((result) => {
                     // Send request to the server
                     if (result.value) {
-                        this.form.delete('api/owners/' + id).then(() => {
+                        this.form.delete('api/city/' + id).then(() => {
                             toast.fire('Success!', 'User has been deleted.', 'success');
                             vm.$emit('afterCreate');
                         }).catch(() => {
@@ -186,6 +214,31 @@
                         });
                     }
                 })
+            },
+
+            /**
+             * Active de row of city
+             * @param id
+             */
+            activeCity(id){
+                swal.fire({
+                    title: 'Do you want to continue?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Confirm',
+                    reverseButtons: true
+                }).then((result)=>{
+                    if (result.value) {
+                        axios.get(`api/city/${id}/edit`)
+                            .then((res) => {
+                                toast.fire('Actived!', 'City: ' + res.data.city_name.toUpperCase() + ' has been actived.', 'success')
+                                vm.$emit('afterUpdate', res);
+                            }).catch(() => {
+                            toast.fire('Error!', 'There was something wronge.', 'error')
+                        });
+                    }
+                });
             },
 
 
@@ -217,13 +270,21 @@
          */
         created() {
             this.loadCities();
+            this.loadDepartaments();
+            //event
+
             vm.$on('afterCreate', () => {
                 this.loadCities();
             });
-            //event
             vm.$on('afterUpdate', (res) => {
-                const index = this.cities.findIndex(itemSearch => itemSearch.id === res.data.id);
-                this.cities[index].city_name = res.data.cities.city_name
+                console.log(res.data);
+                for (var i = 0; i < this.cities.data.length; i++) {
+                    if(this.cities.data[i].id === res.data.id){
+                        this.cities.data[i].city_name = res.data.city_name;
+                        this.cities.data[i].departament.departament_name = res.data.departament.departament_name;
+                        this.cities.data[i].status = res.data.status;
+                    }
+                }
             })
         }
 

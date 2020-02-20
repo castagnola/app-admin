@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <h3 class="card-title">User List</h3>
                         <div class="card-tools">
-                            <button v-if="$gate.isAdmin()"  type="button" class="btn btn-block btn-outline-success" v-on:click="newModal()">Add
+                            <button type="button" class="btn btn-block btn-outline-success" v-on:click="newModal()">Add
                                 new
                                 <i class="fas fa-user-plus"></i>
                             </button>
@@ -34,7 +34,7 @@
                                 <td>{{user.email}}</td>
                                 <td>{{user.roles.description | upText}}</td>
                                 <td>{{user.status === 1 ? 'Activo' : 'Desactivo'}}</td>
-                                <td>{{user.created_at | myDate}}</td>
+                                <td>{{user.created_at === null ? 'N/A' : user.created_at | myDate}}</td>
 
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(user)">
