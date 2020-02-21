@@ -20,24 +20,18 @@
                             <tr>
                                 <th>Identification Number</th>
                                 <th>First Name</th>
-                                <th>Second Name</th>
                                 <th>Last name</th>
-                                <th>Address</th>
-                                <th>Phone Number</th>
                                 <th>City</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="driver in drivers" :key="driver.id">
+                            <tr v-for="driver in drivers.data" :key="driver.id">
                                 <td>{{driver.identification_number}}</td>
                                 <td>{{driver.first_name}}</td>
-                                <td>{{driver.second_name}}</td>
                                 <td>{{driver.last_name}}</td>
-                                <td>{{driver.address}}</td>
-                                <td>{{driver.phone_number}}</td>
-                                <td>{{driver.city_id}}</td>
+                                <td>{{driver.city.city_name}}</td>
                                 <td>{{driver.status === 1 ? 'Activo' : 'Desactivo'}}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(driver)">
@@ -51,6 +45,10 @@
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <!-- pagination --->
+                    <div class="card-footer">
+                        <pagination :data="drivers" @pagination-change-page="getResults"></pagination>
                     </div>
                 </div>
             </div>
@@ -121,7 +119,7 @@
                             </div>
 
                             <div class="form-group">
-                                <select name="role_id" v-model="form.city" id="city_id" class="form-control"
+                                <select name="city_id" v-model="form.city.id" id="city_id" class="form-control"
                                         :class="{ 'is-invalid': form.errors.has('city_id') }">
                                     <option value="" disabled selected>Select City</option>
                                     <option v-for="(city,key) in cities" :value="city.id">
@@ -153,7 +151,7 @@
         name: "DriversComponent",
         data() {
             return {
-                drivers: [],
+                drivers: {},
                 cities: [],
                 editmode: false,
                 form: new Form({
@@ -165,27 +163,28 @@
                     address: '',
                     phone_number: '',
                     city_id: '',
+                    city:[],
                 })
             }
         },
         methods: {
-
             /**
-             * Load all drivers
+             * Load Paginate drivers
              */
-            loadDrivers() {
-                axios.get(`api/drivers`)
-                    .then((res) => {
+            getResults(page =1){
+                axios.get(`api/get-driver-paginate?=page=${page}`)
+                    .then((res)=>{
                         this.drivers = res.data
-                    })
+                    });
             },
+
             /**
              * Load all cities
              */
             loadCities() {
                 axios.get(`api/city`)
                     .then((res) => {
-                        this.cities = res.data.data
+                        this.cities = res.data
                     })
             },
 
@@ -247,13 +246,12 @@
                         this.form.delete('api/drivers/' + id).then(() => {
                             toast.fire('Success!', 'User has been deleted.', 'success');
                             vm.$emit('afterCreate');
-                        }).catch(() => {
-                            toast.fire('Error!', 'There was something wronge.', 'error');
+                        }).catch(error => {
+                            toast.fire('Error!', error.response.data.message, 'error');
                         });
                     }
                 })
             },
-
 
             /**
              * Show and complete driver info
@@ -282,7 +280,7 @@
          * Methods first charge
          */
         created() {
-            this.loadDrivers();
+            this.getResults();
             this.loadCities();
             vm.$on('afterCreate', () => {
                 this.loadDrivers();

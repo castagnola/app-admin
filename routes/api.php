@@ -41,3 +41,4 @@ Route::resource('department','ResourceController\DepartmentsController');
  * Api Custom Routes
  */
 Route::get('get-city-paginate','CustomController\CitiesController@index');
+Route::get('get-driver-paginate','CustomController\DriversController@index');

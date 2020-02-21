@@ -79,7 +79,7 @@
                                 <has-error :form="form" field="city_name"></has-error>
                             </div>
                             <div class="form-group">
-                                <select name="driver_id" v-model="form.departament_id" id="departament_id" class="form-control"
+                                <select name="departament_id" v-model="form.departament_id" id="departament_id" class="form-control"
                                         :class="{ 'is-invalid': form.errors.has('departament_id') }">
                                     <option value="" disabled selected>Select Departament</option>
                                     <option v-for="(departament,key) in departaments" :value="departament.id">
@@ -141,16 +141,6 @@
             },
 
             /**
-             * Load all cities
-             */
-            loadCities() {
-                axios.get(`api/get-city-paginate`)
-                    .then((res) => {
-                        this.cities = res.data
-                    })
-            },
-
-            /**
              * Show modal to create new city
              */
             newModal() {
@@ -166,10 +156,11 @@
             create() {
                 this.editmode = false;
                 this.form.post('api/city')
-                    .then(() => {
+                    .then((res) => {
+                        console.log(res);
                         vm.$emit('afterCreate');
                         $('#addOwners').modal('hide')
-                        toast.fire('Success!', 'City Created in successfully.', 'success');
+                        toast.fire('Success!', res.data.message, 'success');
                     })
                     .catch(() => {
                         toast.fire('Uops!', 'Complete all fields!', 'warning');
@@ -184,7 +175,7 @@
                     .then((res) => {
                         // success
                         $('#addOwners').modal('hide');
-                        toast.fire('Updated!', 'City: ' + res.data.city_name.toUpperCase() + ' has been updated.', 'success')
+                        toast.fire('Updated!', res.data.message, 'success');
                         vm.$emit('afterUpdate', res);
                     }).catch(() => {
                     toast.fire('Error!', 'There was something wronge.', 'error')
@@ -206,8 +197,8 @@
                 }).then((result) => {
                     // Send request to the server
                     if (result.value) {
-                        this.form.delete('api/city/' + id).then(() => {
-                            toast.fire('Success!', 'User has been deleted.', 'success');
+                        this.form.delete('api/city/' + id).then((res) => {
+                            toast.fire('Success!', res.data.message, 'success');
                             vm.$emit('afterCreate');
                         }).catch(() => {
                             toast.fire('Error!', 'There was something wronge.', 'error');
@@ -232,8 +223,9 @@
                     if (result.value) {
                         axios.get(`api/city/${id}/edit`)
                             .then((res) => {
-                                toast.fire('Actived!', 'City: ' + res.data.city_name.toUpperCase() + ' has been actived.', 'success')
-                                vm.$emit('afterUpdate', res);
+                                // toast.fire('Actived!', 'City: ' + res.data.city_name.toUpperCase() + ' has been actived.', 'success')
+                                toast.fire('Actived!', res.data.message, 'success')
+                                vm.$emit('afterUpdate', res.data);
                             }).catch(() => {
                             toast.fire('Error!', 'There was something wronge.', 'error')
                         });
@@ -269,12 +261,12 @@
          * Methods first charge
          */
         created() {
-            this.loadCities();
+            this.getResults();
             this.loadDepartaments();
             //event
 
             vm.$on('afterCreate', () => {
-                this.loadCities();
+                this.getResults();
             });
             vm.$on('afterUpdate', (res) => {
                 console.log(res.data);

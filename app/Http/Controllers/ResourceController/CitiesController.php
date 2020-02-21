@@ -22,7 +22,7 @@ class CitiesController extends Controller
      */
     public function index()
     {
-        return City::where('status','=',1)->get();
+        return City::where('status', '=', 1)->get();
     }
 
     /**
@@ -47,14 +47,19 @@ class CitiesController extends Controller
             'city_name' => 'required|string',
             'departament_id' => 'required',
         ]);
+        try {
+            $city = new City();
+            $city->city_name = $request->city_name;
+            $city->departament_id = $request->departament_id;
+            $city->status = 1;
+            $city->save();
 
-        $city = new City();
-        $city->city_name = $request->city_name;
-        $city->departament_id = $request->departament_id;
-        $city->status = 1;
-        $city->save();
+            return response()->json(['message' => 'City: ' . $city->city_name . ' Created in successfully.'], 200);
 
-        return $city;
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+        }
+
     }
 
     /**
@@ -80,7 +85,9 @@ class CitiesController extends Controller
         $city->status = 1;
         $city->update();
 
-        return City::with('departament')->find($city->id);
+        $data = City::with('departament')->find($city->id);
+
+        return response()->json(['message' => 'City: ' . $city->city_name . ', has been actived.', 'data' => $data], 200);
     }
 
     /**
@@ -96,14 +103,23 @@ class CitiesController extends Controller
             'city_name' => 'required|string',
             'departament_id' => 'required',
         ]);
+        try {
+            $city = City::find($id);
+            $city->city_name = $request->city_name;
+            $city->departament_id = $request->departament_id;
+            $city->status = 1;
+            $city->update();
 
-        $city = City::find($id);
-        $city->city_name = $request->city_name;
-        $city->departament_id = $request->departament_id;
-        $city->status = 1;
-        $city->update();
+            $data = City::with('departament')->find($city->id);
 
-        return City::with('departament')->find($city->id);
+            return response()->json(['message' => 'City: ' . $city->city_name . ', has been updated.', 'data' => $data], 200);
+
+        } catch (\Exception $exception) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+
+        }
+
+
     }
 
     /**
@@ -114,6 +130,13 @@ class CitiesController extends Controller
      */
     public function destroy($id)
     {
-        City::where('id',$id)->update(['status'=>0]);
+        try {
+            City::where('id', $id)->update(['status' => 0]);
+            return response()->json(['message' => 'City has been deleted.'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+        }
+
     }
 }

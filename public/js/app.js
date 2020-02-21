@@ -2035,17 +2035,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
 
     /**
-     * Load all cities
-     */
-    loadCities: function loadCities() {
-      var _this3 = this;
-
-      axios.get("api/get-city-paginate").then(function (res) {
-        _this3.cities = res.data;
-      });
-    },
-
-    /**
      * Show modal to create new city
      */
     newModal: function newModal() {
@@ -2060,10 +2049,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      */
     create: function create() {
       this.editmode = false;
-      this.form.post('api/city').then(function () {
+      this.form.post('api/city').then(function (res) {
+        console.log(res);
         vm.$emit('afterCreate');
         $('#addOwners').modal('hide');
-        toast.fire('Success!', 'City Created in successfully.', 'success');
+        toast.fire('Success!', res.data.message, 'success');
       })["catch"](function () {
         toast.fire('Uops!', 'Complete all fields!', 'warning');
       });
@@ -2076,7 +2066,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.form.put('api/city/' + this.form.id).then(function (res) {
         // success
         $('#addOwners').modal('hide');
-        toast.fire('Updated!', 'City: ' + res.data.city_name.toUpperCase() + ' has been updated.', 'success');
+        toast.fire('Updated!', res.data.message, 'success');
         vm.$emit('afterUpdate', res);
       })["catch"](function () {
         toast.fire('Error!', 'There was something wronge.', 'error');
@@ -2088,7 +2078,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      * @param id
      */
     deleteCity: function deleteCity(id) {
-      var _this4 = this;
+      var _this3 = this;
 
       swal.fire({
         title: 'Do you want to continue?',
@@ -2100,8 +2090,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }).then(function (result) {
         // Send request to the server
         if (result.value) {
-          _this4.form["delete"]('api/city/' + id).then(function () {
-            toast.fire('Success!', 'User has been deleted.', 'success');
+          _this3.form["delete"]('api/city/' + id).then(function (res) {
+            toast.fire('Success!', res.data.message, 'success');
             vm.$emit('afterCreate');
           })["catch"](function () {
             toast.fire('Error!', 'There was something wronge.', 'error');
@@ -2125,8 +2115,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }).then(function (result) {
         if (result.value) {
           axios.get("api/city/".concat(id, "/edit")).then(function (res) {
-            toast.fire('Actived!', 'City: ' + res.data.city_name.toUpperCase() + ' has been actived.', 'success');
-            vm.$emit('afterUpdate', res);
+            // toast.fire('Actived!', 'City: ' + res.data.city_name.toUpperCase() + ' has been actived.', 'success')
+            toast.fire('Actived!', res.data.message, 'success');
+            vm.$emit('afterUpdate', res.data);
           })["catch"](function () {
             toast.fire('Error!', 'There was something wronge.', 'error');
           });
@@ -2156,22 +2147,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
    * Methods first charge
    */
   created: function created() {
-    var _this5 = this;
+    var _this4 = this;
 
-    this.loadCities();
+    this.getResults();
     this.loadDepartaments(); //event
 
     vm.$on('afterCreate', function () {
-      _this5.loadCities();
+      _this4.getResults();
     });
     vm.$on('afterUpdate', function (res) {
       console.log(res.data);
 
-      for (var i = 0; i < _this5.cities.data.length; i++) {
-        if (_this5.cities.data[i].id === res.data.id) {
-          _this5.cities.data[i].city_name = res.data.city_name;
-          _this5.cities.data[i].departament.departament_name = res.data.departament.departament_name;
-          _this5.cities.data[i].status = res.data.status;
+      for (var i = 0; i < _this4.cities.data.length; i++) {
+        if (_this4.cities.data[i].id === res.data.id) {
+          _this4.cities.data[i].city_name = res.data.city_name;
+          _this4.cities.data[i].departament.departament_name = res.data.departament.departament_name;
+          _this4.cities.data[i].status = res.data.status;
         }
       }
     });
@@ -2339,13 +2330,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "DriversComponent",
   data: function data() {
     return {
-      drivers: [],
+      drivers: {},
       cities: [],
       editmode: false,
       form: new Form({
@@ -2356,18 +2345,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         last_name: '',
         address: '',
         phone_number: '',
-        city_id: ''
+        city_id: '',
+        city: []
       })
     };
   },
   methods: _defineProperty({
     /**
-     * Load all drivers
+     * Load Paginate drivers
      */
-    loadDrivers: function loadDrivers() {
+    getResults: function getResults() {
       var _this = this;
 
-      axios.get("api/drivers").then(function (res) {
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      axios.get("api/get-driver-paginate?=page=".concat(page)).then(function (res) {
         _this.drivers = res.data;
       });
     },
@@ -2379,7 +2370,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this2 = this;
 
       axios.get("api/city").then(function (res) {
-        _this2.cities = res.data.data;
+        _this2.cities = res.data;
       });
     },
 
@@ -2440,8 +2431,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           _this3.form["delete"]('api/drivers/' + id).then(function () {
             toast.fire('Success!', 'User has been deleted.', 'success');
             vm.$emit('afterCreate');
-          })["catch"](function () {
-            toast.fire('Error!', 'There was something wronge.', 'error');
+          })["catch"](function (error) {
+            toast.fire('Error!', error.response.data.message, 'error');
           });
         }
       });
@@ -2471,7 +2462,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   created: function created() {
     var _this4 = this;
 
-    this.loadDrivers();
+    this.getResults();
     this.loadCities();
     vm.$on('afterCreate', function () {
       _this4.loadDrivers();
@@ -63041,7 +63032,10 @@ var render = function() {
                                 "departament_id"
                               )
                             },
-                            attrs: { name: "driver_id", id: "departament_id" },
+                            attrs: {
+                              name: "departament_id",
+                              id: "departament_id"
+                            },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -63258,21 +63252,15 @@ var render = function() {
                 _vm._v(" "),
                 _c(
                   "tbody",
-                  _vm._l(_vm.drivers, function(driver) {
+                  _vm._l(_vm.drivers.data, function(driver) {
                     return _c("tr", { key: driver.id }, [
                       _c("td", [_vm._v(_vm._s(driver.identification_number))]),
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(driver.first_name))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(driver.second_name))]),
-                      _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(driver.last_name))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(driver.address))]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(driver.phone_number))]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(driver.city_id))]),
+                      _c("td", [_vm._v(_vm._s(driver.city.city_name))]),
                       _vm._v(" "),
                       _c("td", [
                         _vm._v(
@@ -63314,7 +63302,19 @@ var render = function() {
                   0
                 )
               ])
-            ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "card-footer" },
+              [
+                _c("pagination", {
+                  attrs: { data: _vm.drivers },
+                  on: { "pagination-change-page": _vm.getResults }
+                })
+              ],
+              1
+            )
           ])
         ]
       )
@@ -63670,15 +63670,15 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.form.city,
-                                expression: "form.city"
+                                value: _vm.form.city.id,
+                                expression: "form.city.id"
                               }
                             ],
                             staticClass: "form-control",
                             class: {
                               "is-invalid": _vm.form.errors.has("city_id")
                             },
-                            attrs: { name: "role_id", id: "city_id" },
+                            attrs: { name: "city_id", id: "city_id" },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -63690,8 +63690,8 @@ var render = function() {
                                     return val
                                   })
                                 _vm.$set(
-                                  _vm.form,
-                                  "city",
+                                  _vm.form.city,
+                                  "id",
                                   $event.target.multiple
                                     ? $$selectedVal
                                     : $$selectedVal[0]
@@ -63805,13 +63805,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("First Name")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Second Name")]),
-        _vm._v(" "),
         _c("th", [_vm._v("Last name")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Address")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Phone Number")]),
         _vm._v(" "),
         _c("th", [_vm._v("City")]),
         _vm._v(" "),

@@ -105,18 +105,24 @@ class DriversController extends Controller
             'phone_number' => 'required|max:10',
             'city_id' => 'required'
         ]);
+        try {
+            $driver = Driver::find($id);
+            $driver->identification_number = $request->identification_number;
+            $driver->first_name = $request->first_name;
+            $driver->second_name = $request->second_name;
+            $driver->last_name = $request->last_name;
+            $driver->address = $request->address;
+            $driver->phone_number = $request->phone_number;
+            $driver->city_id = 1;
+            $driver->update();
 
-        $driver = Driver::find($id);
-        $driver->identification_number = $request->identification_number;
-        $driver->first_name = $request->first_name;
-        $driver->second_name = $request->second_name;
-        $driver->last_name = $request->last_name;
-        $driver->address = $request->address;
-        $driver->phone_number = $request->phone_number;
-        $driver->city_id = 1;
-        $driver->update();
+            return $driver;
 
-        return $driver;
+        } catch (\Exception $e) {
+            return response()->json(['message'=>'There was something wronge.'],500);
+
+        }
+
     }
 
     /**
@@ -127,9 +133,7 @@ class DriversController extends Controller
      */
     public function destroy($id)
     {
-        $driver = Driver::find($id);
-        $driver->status = 0;
-        $driver->save();
+        Driver::where('id',$id)->update(['status'=>0]);
 
     }
 }
