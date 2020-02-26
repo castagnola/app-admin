@@ -4,7 +4,7 @@
             <div style="margin-top: 10px" class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Cities List</h3>
+                        <h3 class="card-title"><i class="fas fa-city"></i> Cities List</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add
@@ -229,8 +229,8 @@
                                 // toast.fire('Actived!', 'City: ' + res.data.city_name.toUpperCase() + ' has been actived.', 'success')
                                 toast.fire('Actived!', res.data.message, 'success')
                                 vm.$emit('afterUpdate', res.data);
-                            }).catch(() => {
-                            toast.fire('Error!', 'There was something wronge.', 'error')
+                            }).catch((error) => {
+                            toast.fire('Error!', error.response.message, 'error')
                         });
                     }
                 });

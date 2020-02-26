@@ -81,13 +81,11 @@ class CitiesController extends Controller
      */
     public function edit($id)
     {
-        $city = City::find($id);
+        $city = City::with('departament')->find($id);
         $city->status = 1;
         $city->update();
 
-        $data = City::with('departament')->find($id);
-
-        return response()->json(['message' => 'City: ' . $city->city_name . ', has been actived.', 'data' => $data], 200);
+        return response()->json(['message' => 'City: ' . $city->city_name . ', has been actived.', 'data' => $city], 200);
     }
 
     /**
@@ -106,15 +104,14 @@ class CitiesController extends Controller
 
         try {
 
-            $city = City::find($id);
+            $city = City::with('departament')->find($id);
             $city->city_name = $request->city_name;
             $city->departament_id = $request->departament_id;
             $city->status = 1;
             $city->update();
 
-            $data = City::with('departament')->find($id);
 
-            return response()->json(['message' => 'City: ' . $city->city_name . ', has been updated.', 'data' => $data], 200);
+            return response()->json(['message' => 'City: ' . $city->city_name . ', has been updated.', 'data' => $city], 200);
 
         } catch (\Exception $exception) {
             return response()->json(['message' => 'There was something wronge.'], 500);

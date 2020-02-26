@@ -2121,8 +2121,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             // toast.fire('Actived!', 'City: ' + res.data.city_name.toUpperCase() + ' has been actived.', 'success')
             toast.fire('Actived!', res.data.message, 'success');
             vm.$emit('afterUpdate', res.data);
-          })["catch"](function () {
-            toast.fire('Error!', 'There was something wronge.', 'error');
+          })["catch"](function (error) {
+            toast.fire('Error!', error.response.message, 'error');
           });
         }
       });
@@ -2183,6 +2183,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _drivers_DriversViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../drivers/DriversViewComponent */ "./resources/js/components/drivers/DriversViewComponent.vue");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 //
@@ -2333,8 +2334,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "DriversComponent",
+  components: {
+    driversViewComponent: _drivers_DriversViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
   data: function data() {
     return {
       drivers: {},
@@ -2406,12 +2422,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      */
     update: function update() {
       this.form.put('api/drivers/' + this.form.id).then(function (res) {
-        // success
         $('#addOwners').modal('hide');
-        toast.fire('Updated!', 'Driver: ' + res.data.first_name.toUpperCase() + ' has been updated.', 'success');
-        vm.$emit('afterUpdate', res);
-      })["catch"](function () {
-        toast.fire('Error!', 'There was something wronge.', 'error');
+        toast.fire('Updated!', res.data.message, 'success');
+        vm.$emit('afterUpdate', res.data);
+      })["catch"](function (error) {
+        toast.fire('Error!', error.response.message, 'error');
       });
     },
 
@@ -2432,11 +2447,30 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }).then(function (result) {
         // Send request to the server
         if (result.value) {
-          _this3.form["delete"]('api/drivers/' + id).then(function () {
+          _this3.form["delete"]('api/drivers/' + id).then(function (res) {
             toast.fire('Success!', 'User has been deleted.', 'success');
-            vm.$emit('afterCreate');
+            vm.$emit('afterUpdate', res.data);
           })["catch"](function (error) {
             toast.fire('Error!', error.response.data.message, 'error');
+          });
+        }
+      });
+    },
+    activeDriver: function activeDriver(id) {
+      swal.fire({
+        title: 'Do you want to continue?',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirm',
+        reverseButtons: true
+      }).then(function (result) {
+        if (result.value) {
+          axios.get("api/drivers/".concat(id, "/edit")).then(function (res) {
+            toast.fire('Success', res.data.message, 'success');
+            vm.$emit('afterUpdate', res.data);
+          })["catch"](function (error) {
+            toast.fire('Error!', error.response.message, 'error');
           });
         }
       });
@@ -2473,18 +2507,98 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }); //event
 
     vm.$on('afterUpdate', function (res) {
-      var index = _this4.drivers.findIndex(function (itemSearch) {
-        return itemSearch.id === res.data.id;
-      });
+      for (var i = 0; i < _this4.drivers.data.length; i++) {
+        console.log(res.data.city);
 
-      _this4.drivers[index].identification_number = res.data.identification_number;
-      _this4.drivers[index].first_name = res.data.first_name;
-      _this4.drivers[index].last_name = res.data.last_name;
-      _this4.drivers[index].phone_number = res.data.phone_number;
-      _this4.drivers[index].second_name = res.data.second_name;
-      _this4.drivers[index].address = res.data.address;
-      _this4.drivers[index].cities.city_name = res.data.cities.city_name;
+        if (_this4.drivers.data[i].id === res.data.id) {
+          _this4.drivers.data[i].identification_number = res.data.identification_number;
+          _this4.drivers.data[i].first_name = res.data.first_name;
+          _this4.drivers.data[i].last_name = res.data.last_name;
+          _this4.drivers.data[i].phone_number = res.data.phone_number;
+          _this4.drivers.data[i].second_name = res.data.second_name;
+          _this4.drivers.data[i].address = res.data.address;
+          _this4.drivers.data[i].status = res.data.status;
+          _this4.drivers.data[i].city.city_name = res.data.city.city_name;
+        }
+      }
     });
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/drivers/DriversViewComponent.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/drivers/DriversViewComponent.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "DriversViewComponent",
+  created: function created() {
+    this.loadViewDriver();
+  },
+  data: function data() {
+    return {
+      driver: []
+    };
+  },
+  methods: {
+    loadViewDriver: function loadViewDriver() {
+      var _this = this;
+
+      console.log(this.$router);
+      var id = this.$route.params.id;
+      axios.get("api/drivers/".concat(id)).then(function (res) {
+        _this.driver = res.data;
+      });
+    }
   }
 });
 
@@ -62781,7 +62895,7 @@ var render = function() {
         [
           _c("div", { staticClass: "card" }, [
             _c("div", { staticClass: "card-header" }, [
-              _c("h3", { staticClass: "card-title" }, [_vm._v("Cities List")]),
+              _vm._m(0),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
                 _c(
@@ -62807,7 +62921,7 @@ var render = function() {
             _vm._v(" "),
             _c("div", { staticClass: "card-body table-responsive p-0" }, [
               _c("table", { staticClass: "table table-hover" }, [
-                _vm._m(0),
+                _vm._m(1),
                 _vm._v(" "),
                 _c(
                   "tbody",
@@ -62956,7 +63070,7 @@ var render = function() {
                   ]
                 ),
                 _vm._v(" "),
-                _vm._m(1)
+                _vm._m(2)
               ]),
               _vm._v(" "),
               _c(
@@ -63098,7 +63212,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-footer" }, [
-                    _vm._m(2),
+                    _vm._m(3),
                     _vm._v(" "),
                     _c(
                       "button",
@@ -63150,6 +63264,15 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "card-title" }, [
+      _c("i", { staticClass: "fas fa-city" }),
+      _vm._v(" Cities List")
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -63272,35 +63395,83 @@ var render = function() {
                         )
                       ]),
                       _vm._v(" "),
-                      _c("td", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.editModal(driver)
+                      _c(
+                        "td",
+                        [
+                          driver.status
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary btn-sm",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.editModal(driver)
+                                    }
+                                  }
+                                },
+                                [_c("i", { staticClass: "fa fa-edit blue" })]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          driver.status
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-danger btn-sm",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.deleteDriver(driver.id)
+                                    }
+                                  }
+                                },
+                                [_c("i", { staticClass: "fa fa-trash red" })]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          !driver.status
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-success btn-sm",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.activeDriver(driver.id)
+                                    }
+                                  }
+                                },
+                                [_c("i", { staticClass: "fas fa-exclamation" })]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c(
+                            "router-link",
+                            {
+                              attrs: {
+                                to: {
+                                  name: "driverView",
+                                  params: { id: driver.id }
+                                }
                               }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-edit blue" })]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.deleteDriver(driver.id)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-trash red" })]
-                        )
-                      ])
+                            },
+                            [
+                              driver.status
+                                ? _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-success btn-sm",
+                                      attrs: { type: "button" }
+                                    },
+                                    [_c("i", { staticClass: "fas fa-eye" })]
+                                  )
+                                : _vm._e()
+                            ]
+                          )
+                        ],
+                        1
+                      )
                     ])
                   }),
                   0
@@ -63848,6 +64019,222 @@ var staticRenderFns = [
       },
       [_vm._v("Close "), _c("i", { staticClass: "fas fa-times" })]
     )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/drivers/DriversViewComponent.vue?vue&type=template&id=71072008&scoped=true&":
+/*!*******************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/drivers/DriversViewComponent.vue?vue&type=template&id=71072008&scoped=true& ***!
+  \*******************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "card" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c("div", { staticClass: "card-body" }, [
+        _c("div", { staticClass: "tab-content" }, [
+          _c("div", { staticClass: "form-group row" }, [
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Name")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value:
+                      _vm.driver.first_name + "   " + _vm.driver.second_name,
+                    expression: "driver.first_name +'   '+ driver.second_name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: {
+                  value: _vm.driver.first_name + "   " + _vm.driver.second_name
+                },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(
+                      _vm.driver.first_name + "   " + _vm.driver,
+                      "second_name",
+                      $event.target.value
+                    )
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Last Name")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.driver.last_name,
+                    expression: "driver.last_name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.driver.last_name },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.driver, "last_name", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group row" }, [
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Address")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.driver.address,
+                    expression: "driver.address"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.driver.address },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.driver, "address", $event.target.value)
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Phone number")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.driver.phone_number,
+                    expression: "driver.phone_number"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.driver.phone_number },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.driver, "phone_number", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group row" }, [
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("City")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.driver.city.city_name,
+                    expression: "driver.city.city_name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.driver.city.city_name },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.driver.city, "city_name", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "card-footer bg-transparent border-dark" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-primary",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                return _vm.$router.go(-1)
+              }
+            }
+          },
+          [
+            _c("i", { staticClass: "fas fa-arrow-circle-left" }),
+            _vm._v(" Back")
+          ]
+        )
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card-header text-white bg-dark" }, [
+      _c("span", [
+        _c("i", { staticClass: "fas fa-user-alt-slash" }),
+        _vm._v(" Driver Information")
+      ])
+    ])
   }
 ]
 render._withStripped = true
@@ -81701,6 +82088,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/drivers/DriversViewComponent.vue":
+/*!******************************************************************!*\
+  !*** ./resources/js/components/drivers/DriversViewComponent.vue ***!
+  \******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _DriversViewComponent_vue_vue_type_template_id_71072008_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DriversViewComponent.vue?vue&type=template&id=71072008&scoped=true& */ "./resources/js/components/drivers/DriversViewComponent.vue?vue&type=template&id=71072008&scoped=true&");
+/* harmony import */ var _DriversViewComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DriversViewComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/drivers/DriversViewComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DriversViewComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DriversViewComponent_vue_vue_type_template_id_71072008_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _DriversViewComponent_vue_vue_type_template_id_71072008_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "71072008",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/drivers/DriversViewComponent.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/drivers/DriversViewComponent.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/drivers/DriversViewComponent.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DriversViewComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./DriversViewComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/drivers/DriversViewComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DriversViewComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/drivers/DriversViewComponent.vue?vue&type=template&id=71072008&scoped=true&":
+/*!*************************************************************************************************************!*\
+  !*** ./resources/js/components/drivers/DriversViewComponent.vue?vue&type=template&id=71072008&scoped=true& ***!
+  \*************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DriversViewComponent_vue_vue_type_template_id_71072008_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./DriversViewComponent.vue?vue&type=template&id=71072008&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/drivers/DriversViewComponent.vue?vue&type=template&id=71072008&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DriversViewComponent_vue_vue_type_template_id_71072008_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DriversViewComponent_vue_vue_type_template_id_71072008_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/owners/OwnersComponent.vue":
 /*!************************************************************!*\
   !*** ./resources/js/components/owners/OwnersComponent.vue ***!
@@ -82228,9 +82684,9 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_router__WEBPACK_IMPORTED_MODU
     path: '/users',
     component: __webpack_require__(/*! ./components/users/UsersComponent */ "./resources/js/components/users/UsersComponent.vue")["default"]
   }, {
-    path: '/users/:id',
-    name: 'user',
-    component: __webpack_require__(/*! ./components/roles/RolesModalComponent */ "./resources/js/components/roles/RolesModalComponent.vue")["default"],
+    path: '/drivers/:id',
+    name: 'driverView',
+    component: __webpack_require__(/*! ./components/drivers/DriversViewComponent.vue */ "./resources/js/components/drivers/DriversViewComponent.vue")["default"],
     props: true
   }, {
     path: '/roles',

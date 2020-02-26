@@ -18,9 +18,9 @@ export default new VueRouter({
             component: require('./components/users/UsersComponent').default
         },
         {
-            path: '/users/:id',
-            name: 'user',
-            component: require('./components/roles/RolesModalComponent').default,
+            path: '/drivers/:id',
+            name: 'driverView',
+            component: require('./components/drivers/DriversViewComponent.vue').default,
             props: true
         },
         {

@@ -74,7 +74,7 @@ class DriversController extends Controller
      */
     public function show($id)
     {
-        //
+        return Driver::with('city')->find($id);
     }
 
     /**
@@ -85,7 +85,17 @@ class DriversController extends Controller
      */
     public function edit($id)
     {
-        //
+        try {
+
+            $driver = Driver::with('city')->find($id);
+            $driver->status = 1;
+            $driver->update();
+
+            return response()->json(['message' => 'Driver: ' . $driver->first_name . ' ' . $driver->last_name . ', has been actived.', 'data' => $driver], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+        }
     }
 
     /**
@@ -117,7 +127,9 @@ class DriversController extends Controller
             $driver->city_id = $request->city_id;
             $driver->update();
 
-            return $driver;
+            $data = Driver::with('city')->find($id);
+            return response()->json(['message' => 'Driver: ' . $driver->first_name . ' ' . $driver->last_name . ', has been updated.', 'data' => $data], 200);
+
 
         } catch (\Exception $e) {
             return response()->json(['message' => 'There was something wronge.'], 500);
@@ -136,7 +148,7 @@ class DriversController extends Controller
     {
         try {
 
-            $driver = Driver::find($id);
+            $driver = Driver::with('city')->find($id);
             $driver->status = 0;
             $driver->update();
 

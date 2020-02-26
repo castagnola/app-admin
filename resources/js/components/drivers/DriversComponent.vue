@@ -4,7 +4,7 @@
             <div style="margin-top: 10px" class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title"> <i class="fas fa-user-alt-slash"></i> Driver List</h3>
+                        <h3 class="card-title"><i class="fas fa-user-alt-slash"></i> Driver List</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add
@@ -16,6 +16,7 @@
                     <!-- /.card-header -->
                     <div class="card-body table-responsive p-0">
                         <table class="table table-hover">
+
                             <thead>
                             <tr>
                                 <th>Identification Number</th>
@@ -34,13 +35,23 @@
                                 <td>{{driver.city.city_name}}</td>
                                 <td>{{driver.status === 1 ? 'Activo' : 'Desactivo'}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(driver)">
+                                    <button v-if="driver.status" type="button" class="btn btn-primary btn-sm"
+                                            v-on:click="editModal(driver)">
                                         <i class="fa fa-edit blue"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm"
+                                    <button v-if="driver.status" type="button" class="btn btn-danger btn-sm"
                                             v-on:click="deleteDriver(driver.id)">
                                         <i class="fa fa-trash red"></i>
                                     </button>
+                                    <button v-if="!driver.status" type="button" class="btn btn-success btn-sm"
+                                            v-on:click="activeDriver(driver.id)">
+                                        <i class="fas fa-exclamation"></i>
+                                    </button>
+                                    <router-link :to="{name:'driverView',params:{id:driver.id}}">
+                                        <button v-if="driver.status" type="button" class="btn btn-success btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </router-link>
                                 </td>
                             </tr>
                             </tbody>
@@ -147,8 +158,13 @@
 </template>
 
 <script>
+    import driversViewComponent from '../drivers/DriversViewComponent'
+
     export default {
         name: "DriversComponent",
+        components: {
+            driversViewComponent
+        },
         data() {
             return {
                 drivers: {},
@@ -163,7 +179,7 @@
                     address: '',
                     phone_number: '',
                     city_id: '',
-                    city:[],
+                    city: [],
                 })
             }
         },
@@ -171,9 +187,9 @@
             /**
              * Load Paginate drivers
              */
-            getResults(page =1){
+            getResults(page = 1) {
                 axios.get(`api/get-driver-paginate?=page=${page}`)
-                    .then((res)=>{
+                    .then((res) => {
                         this.drivers = res.data
                     });
             },
@@ -220,12 +236,11 @@
             update() {
                 this.form.put('api/drivers/' + this.form.id)
                     .then((res) => {
-                        // success
                         $('#addOwners').modal('hide');
-                        toast.fire('Updated!', 'Driver: ' + res.data.first_name.toUpperCase() + ' has been updated.', 'success')
-                        vm.$emit('afterUpdate', res);
-                    }).catch(() => {
-                    toast.fire('Error!', 'There was something wronge.', 'error')
+                        toast.fire('Updated!', res.data.message, 'success');
+                        vm.$emit('afterUpdate', res.data);
+                    }).catch((error) => {
+                    toast.fire('Error!', error.response.message, 'error')
                 });
             },
 
@@ -244,12 +259,34 @@
                 }).then((result) => {
                     // Send request to the server
                     if (result.value) {
-                        this.form.delete('api/drivers/' + id).then(() => {
-                            toast.fire('Success!', 'User has been deleted.', 'success');
-                            vm.$emit('afterCreate');
-                        }).catch(error => {
+                        this.form.delete('api/drivers/' + id)
+                            .then((res) => {
+                                toast.fire('Success!', 'User has been deleted.', 'success');
+                                vm.$emit('afterUpdate', res.data);
+                            }).catch(error => {
                             toast.fire('Error!', error.response.data.message, 'error');
                         });
+                    }
+                })
+            },
+
+            activeDriver(id) {
+                swal.fire({
+                    title: 'Do you want to continue?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Confirm',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value) {
+                        axios.get(`api/drivers/${id}/edit`)
+                            .then((res) => {
+                                toast.fire('Success', res.data.message, 'success');
+                                vm.$emit('afterUpdate', res.data);
+                            }).catch((error) => {
+                            toast.fire('Error!', error.response.message, 'error')
+                        })
                     }
                 })
             },
@@ -288,14 +325,20 @@
             });
             //event
             vm.$on('afterUpdate', (res) => {
-                const index = this.drivers.findIndex(itemSearch => itemSearch.id === res.data.id);
-                this.drivers[index].identification_number = res.data.identification_number;
-                this.drivers[index].first_name = res.data.first_name;
-                this.drivers[index].last_name = res.data.last_name;
-                this.drivers[index].phone_number = res.data.phone_number;
-                this.drivers[index].second_name = res.data.second_name;
-                this.drivers[index].address = res.data.address;
-                this.drivers[index].cities.city_name = res.data.cities.city_name
+                for (var i = 0; i < this.drivers.data.length; i++) {
+                    console.log(res.data.city)
+                    if (this.drivers.data[i].id === res.data.id) {
+                        this.drivers.data[i].identification_number = res.data.identification_number;
+                        this.drivers.data[i].first_name = res.data.first_name;
+                        this.drivers.data[i].last_name = res.data.last_name;
+                        this.drivers.data[i].phone_number = res.data.phone_number;
+                        this.drivers.data[i].second_name = res.data.second_name;
+                        this.drivers.data[i].address = res.data.address;
+                        this.drivers.data[i].status = res.data.status;
+                        this.drivers.data[i].city.city_name = res.data.city.city_name
+                    }
+                }
+
             })
         }
 
