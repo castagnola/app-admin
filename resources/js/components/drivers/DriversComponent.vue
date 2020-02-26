@@ -119,7 +119,7 @@
                             </div>
 
                             <div class="form-group">
-                                <select name="city_id" v-model="form.city.id" id="city_id" class="form-control"
+                                <select name="city_id" v-model="form.city_id" id="city_id" class="form-control"
                                         :class="{ 'is-invalid': form.errors.has('city_id') }">
                                     <option value="" disabled selected>Select City</option>
                                     <option v-for="(city,key) in cities" :value="city.id">
@@ -235,11 +235,12 @@
              */
             deleteDriver(id) {
                 swal.fire({
-                    title: 'Are you sure?',
+                    title: 'Do you want to continue?',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Delete'
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Delete',
+                    reverseButtons: true
                 }).then((result) => {
                     // Send request to the server
                     if (result.value) {

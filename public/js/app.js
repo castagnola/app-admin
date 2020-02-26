@@ -1997,6 +1997,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "CitiesComponent",
   data: function data() {
@@ -2067,9 +2069,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         // success
         $('#addOwners').modal('hide');
         toast.fire('Updated!', res.data.message, 'success');
-        vm.$emit('afterUpdate', res);
-      })["catch"](function () {
-        toast.fire('Error!', 'There was something wronge.', 'error');
+        vm.$emit('afterUpdate', res.data);
+      })["catch"](function (error) {
+        toast.fire('Error!', error.response.data.message, 'error');
       });
     },
 
@@ -2092,7 +2094,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         if (result.value) {
           _this3.form["delete"]('api/city/' + id).then(function (res) {
             toast.fire('Success!', res.data.message, 'success');
-            vm.$emit('afterCreate');
+            console.log(res);
+            vm.$emit('afterUpdate', res.data);
           })["catch"](function () {
             toast.fire('Error!', 'There was something wronge.', 'error');
           });
@@ -2420,11 +2423,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this3 = this;
 
       swal.fire({
-        title: 'Are you sure?',
+        title: 'Do you want to continue?',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Delete'
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Delete',
+        reverseButtons: true
       }).then(function (result) {
         // Send request to the server
         if (result.value) {
@@ -63670,8 +63674,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.form.city.id,
-                                expression: "form.city.id"
+                                value: _vm.form.city_id,
+                                expression: "form.city_id"
                               }
                             ],
                             staticClass: "form-control",
@@ -63690,8 +63694,8 @@ var render = function() {
                                     return val
                                   })
                                 _vm.$set(
-                                  _vm.form.city,
-                                  "id",
+                                  _vm.form,
+                                  "city_id",
                                   $event.target.multiple
                                     ? $$selectedVal
                                     : $$selectedVal[0]

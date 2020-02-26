@@ -49,6 +49,7 @@ class DriversController extends Controller
             'last_name' => 'required|string|max:50',
             'address' => 'required|string|max:50',
             'phone_number' => 'required|max:10',
+            'city_id' => 'required',
         ]);
 
         $driver = new Driver();
@@ -58,7 +59,7 @@ class DriversController extends Controller
         $driver->last_name = $request->last_name;
         $driver->address = $request->address;
         $driver->phone_number = $request->phone_number;
-        $driver->city_id = 1;
+        $driver->city_id = $request->id;
         $driver->status = 1;
         $driver->save();
 
@@ -113,13 +114,13 @@ class DriversController extends Controller
             $driver->last_name = $request->last_name;
             $driver->address = $request->address;
             $driver->phone_number = $request->phone_number;
-            $driver->city_id = 1;
+            $driver->city_id = $request->city_id;
             $driver->update();
 
             return $driver;
 
         } catch (\Exception $e) {
-            return response()->json(['message'=>'There was something wronge.'],500);
+            return response()->json(['message' => 'There was something wronge.'], 500);
 
         }
 
@@ -133,7 +134,17 @@ class DriversController extends Controller
      */
     public function destroy($id)
     {
-        Driver::where('id',$id)->update(['status'=>0]);
+        try {
+
+            $driver = Driver::find($id);
+            $driver->status = 0;
+            $driver->update();
+
+            return response()->json(['message' => 'City has been deleted.', 'data' => $driver], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+        }
 
     }
 }

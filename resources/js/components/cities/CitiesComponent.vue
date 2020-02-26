@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Cities List</h3>
                         <div class="card-tools">
-                            <button  type="button" class="btn btn-block btn-outline-success"
+                            <button type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add
                                 new
                                 <i class="fas fa-city"></i>
@@ -30,7 +30,8 @@
                                 <td>{{city.departament.departament_name}}</td>
                                 <td>{{city.status === 1 ? 'Activo' : 'Desactivo'}}</td>
                                 <td>
-                                    <button v-if="city.status" type="button" class="btn btn-primary btn-sm" v-on:click="editModal(city)">
+                                    <button v-if="city.status" type="button" class="btn btn-primary btn-sm"
+                                            v-on:click="editModal(city)">
                                         <i class="fa fa-edit blue"></i>
                                     </button>
                                     <button v-if="city.status" type="button" class="btn btn-danger btn-sm"
@@ -61,10 +62,10 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" v-show="!editmode" id="addOwnersLabel">Add New <i
-                                class="fas fa-city"></i>
+                            class="fas fa-city"></i>
                         </h5>
                         <h5 class="modal-title" v-show="editmode" id="addOwnersLabel">Update City <i
-                                class="fas fa-city"></i></h5>
+                            class="fas fa-city"></i></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -79,7 +80,8 @@
                                 <has-error :form="form" field="city_name"></has-error>
                             </div>
                             <div class="form-group">
-                                <select name="departament_id" v-model="form.departament_id" id="departament_id" class="form-control"
+                                <select name="departament_id" v-model="form.departament_id" id="departament_id"
+                                        class="form-control"
                                         :class="{ 'is-invalid': form.errors.has('departament_id') }">
                                     <option value="" disabled selected>Select Departament</option>
                                     <option v-for="(departament,key) in departaments" :value="departament.id">
@@ -91,12 +93,12 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close <i
-                                    class="fas fa-times"></i></button>
+                                class="fas fa-times"></i></button>
 
                             <button v-show="editmode" type="submit" class="btn btn-success">Save <i
-                                    class="fas fa-check"></i></button>
+                                class="fas fa-check"></i></button>
                             <button v-show="!editmode" type="submit" class="btn btn-success">Create <i
-                                    class="fas fa-plus"></i></button>
+                                class="fas fa-plus"></i></button>
                         </div>
                     </form>
                 </div>
@@ -110,15 +112,15 @@
         name: "CitiesComponent",
         data() {
             return {
-                cities:{},
-                departaments:[],
+                cities: {},
+                departaments: [],
                 editmode: false,
                 form: new Form({
                     id: '',
                     city_name: '',
-                    departament_id :'',
-                    departament:[],
-                    status:''
+                    departament_id: '',
+                    departament: [],
+                    status: ''
                 })
             }
         },
@@ -133,8 +135,8 @@
             /**
              * Load all Departments
              */
-            loadDepartaments(){
-                axios.get(`api/department`).then((res)=>{
+            loadDepartaments() {
+                axios.get(`api/department`).then((res) => {
                     this.departaments = res.data
                 })
 
@@ -176,9 +178,9 @@
                         // success
                         $('#addOwners').modal('hide');
                         toast.fire('Updated!', res.data.message, 'success');
-                        vm.$emit('afterUpdate', res);
-                    }).catch(() => {
-                    toast.fire('Error!', 'There was something wronge.', 'error')
+                        vm.$emit('afterUpdate', res.data);
+                    }).catch((error) => {
+                    toast.fire('Error!', error.response.data.message, 'error')
                 });
             },
 
@@ -199,7 +201,8 @@
                     if (result.value) {
                         this.form.delete('api/city/' + id).then((res) => {
                             toast.fire('Success!', res.data.message, 'success');
-                            vm.$emit('afterCreate');
+                            console.log(res);
+                            vm.$emit('afterUpdate', res.data);
                         }).catch(() => {
                             toast.fire('Error!', 'There was something wronge.', 'error');
                         });
@@ -211,7 +214,7 @@
              * Active de row of city
              * @param id
              */
-            activeCity(id){
+            activeCity(id) {
                 swal.fire({
                     title: 'Do you want to continue?',
                     showCancelButton: true,
@@ -219,7 +222,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Confirm',
                     reverseButtons: true
-                }).then((result)=>{
+                }).then((result) => {
                     if (result.value) {
                         axios.get(`api/city/${id}/edit`)
                             .then((res) => {
@@ -232,7 +235,6 @@
                     }
                 });
             },
-
 
             /**
              * Show and complete city info
@@ -271,7 +273,7 @@
             vm.$on('afterUpdate', (res) => {
                 console.log(res.data);
                 for (var i = 0; i < this.cities.data.length; i++) {
-                    if(this.cities.data[i].id === res.data.id){
+                    if (this.cities.data[i].id === res.data.id) {
                         this.cities.data[i].city_name = res.data.city_name;
                         this.cities.data[i].departament.departament_name = res.data.departament.departament_name;
                         this.cities.data[i].status = res.data.status;

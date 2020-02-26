@@ -85,7 +85,7 @@ class CitiesController extends Controller
         $city->status = 1;
         $city->update();
 
-        $data = City::with('departament')->find($city->id);
+        $data = City::with('departament')->find($id);
 
         return response()->json(['message' => 'City: ' . $city->city_name . ', has been actived.', 'data' => $data], 200);
     }
@@ -103,14 +103,16 @@ class CitiesController extends Controller
             'city_name' => 'required|string',
             'departament_id' => 'required',
         ]);
+
         try {
+
             $city = City::find($id);
             $city->city_name = $request->city_name;
             $city->departament_id = $request->departament_id;
             $city->status = 1;
             $city->update();
 
-            $data = City::with('departament')->find($city->id);
+            $data = City::with('departament')->find($id);
 
             return response()->json(['message' => 'City: ' . $city->city_name . ', has been updated.', 'data' => $data], 200);
 
@@ -131,8 +133,12 @@ class CitiesController extends Controller
     public function destroy($id)
     {
         try {
-            City::where('id', $id)->update(['status' => 0]);
-            return response()->json(['message' => 'City has been deleted.'], 200);
+
+            $city = City::with('departament')->find($id);
+            $city->status = 0;
+            $city->update();
+
+            return response()->json(['message' => 'City has been deleted.','data'=>$city], 200);
 
         } catch (\Exception $e) {
             return response()->json(['message' => 'There was something wronge.'], 500);
