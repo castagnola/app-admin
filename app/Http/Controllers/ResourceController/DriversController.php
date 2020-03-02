@@ -51,19 +51,25 @@ class DriversController extends Controller
             'phone_number' => 'required|max:10',
             'city_id' => 'required',
         ]);
+        try {
+            $driver = new Driver();
+            $driver->identification_number = $request->identification_number;
+            $driver->first_name = $request->first_name;
+            $driver->second_name = $request->second_name;
+            $driver->last_name = $request->last_name;
+            $driver->address = $request->address;
+            $driver->phone_number = $request->phone_number;
+            $driver->city_id = $request->city_id;
+            $driver->status = 1;
+            $driver->save();
 
-        $driver = new Driver();
-        $driver->identification_number = $request->identification_number;
-        $driver->first_name = $request->first_name;
-        $driver->second_name = $request->second_name;
-        $driver->last_name = $request->last_name;
-        $driver->address = $request->address;
-        $driver->phone_number = $request->phone_number;
-        $driver->city_id = $request->id;
-        $driver->status = 1;
-        $driver->save();
+            return response()->json(['message' => 'Driver: ' . $driver->first_name . ' ' . $driver->last_name . ', Created in successfully.'], 200);
 
-        return $driver;
+        } catch (\Exception $exception) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+
+        }
+
     }
 
     /**

@@ -20,8 +20,6 @@ class CreateVehiclesTable extends Migration
             $table->string('brand',200);
             $table->integer('tipe_id')->unsigned();
             $table->foreign('tipe_id')->references('id')->on('tipe_vehicle');
-            $table->integer('driver_id')->unsigned();
-            $table->foreign('driver_id')->references('id')->on('drivers');
             $table->integer('owner_id')->unsigned();
             $table->foreign('owner_id')->references('id')->on('owners');
             $table->tinyInteger('status')->default(1);

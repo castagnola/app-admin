@@ -7,4 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Owner extends Model
 {
     public $table = "owners";
+
+    public function city(){
+        return $this->hasOne('App\Models\City','id','city_id');
+    }
 }

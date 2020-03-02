@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="container">
-        <div class="d-flex justify-content-center h-50">
+        <div class="d-flex justify-content-center h-75">
             <div class="card">
                 <div class="card-header">
                     <h3>Sign In</h3>

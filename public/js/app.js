@@ -2183,9 +2183,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _drivers_DriversViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../drivers/DriversViewComponent */ "./resources/js/components/drivers/DriversViewComponent.vue");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _drivers_DriversViewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../drivers/DriversViewComponent */ "./resources/js/components/drivers/DriversViewComponent.vue");
+
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+//
+//
 //
 //
 //
@@ -2349,7 +2355,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "DriversComponent",
   components: {
-    driversViewComponent: _drivers_DriversViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
+    driversViewComponent: _drivers_DriversViewComponent__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
@@ -2370,6 +2376,33 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     };
   },
   methods: _defineProperty({
+    downloadPdf: function downloadPdf() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function downloadPdf$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              axios({
+                url: '/driver-pdf',
+                method: 'GET',
+                responseType: 'blob' // important
+
+              }).then(function (response) {
+                var url = window.URL.createObjectURL(new Blob([response.data]));
+                var link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'drivers.pdf');
+                document.body.appendChild(link);
+                link.click();
+              });
+
+            case 1:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
+    },
+
     /**
      * Load Paginate drivers
      */
@@ -2407,13 +2440,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      * Create a new Owner
      */
     create: function create() {
+      var _this3 = this;
+
       this.editmode = false;
-      this.form.post('api/drivers').then(function () {
-        vm.$emit('afterCreate');
+      this.form.post('api/drivers').then(function (res) {
+        _this3.getResults();
+
         $('#addOwners').modal('hide');
-        toast.fire('Success!', 'Driver Created in successfully.', 'success');
-      })["catch"](function () {
-        toast.fire('Uops!', 'Complete all fields!', 'warning');
+        toast.fire('Success!', res.data.message, 'success');
+      })["catch"](function (error) {
+        toast.fire('Uops!', error.response.message, 'warning');
       });
     },
 
@@ -2435,7 +2471,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      * @param id
      */
     deleteDriver: function deleteDriver(id) {
-      var _this3 = this;
+      var _this4 = this;
 
       swal.fire({
         title: 'Do you want to continue?',
@@ -2447,8 +2483,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }).then(function (result) {
         // Send request to the server
         if (result.value) {
-          _this3.form["delete"]('api/drivers/' + id).then(function (res) {
-            toast.fire('Success!', 'User has been deleted.', 'success');
+          _this4.form["delete"]("api/drivers/".concat(id)).then(function (res) {
+            toast.fire('Success!', res.data.message, 'success');
             vm.$emit('afterUpdate', res.data);
           })["catch"](function (error) {
             toast.fire('Error!', error.response.data.message, 'error');
@@ -2456,6 +2492,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
       });
     },
+
+    /**
+     *Active status of driver
+     */
     activeDriver: function activeDriver(id) {
       swal.fire({
         title: 'Do you want to continue?',
@@ -2498,27 +2538,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
    * Methods first charge
    */
   created: function created() {
-    var _this4 = this;
+    var _this5 = this;
 
     this.getResults();
-    this.loadCities();
-    vm.$on('afterCreate', function () {
-      _this4.loadDrivers();
-    }); //event
+    this.loadCities(); //event
 
     vm.$on('afterUpdate', function (res) {
-      for (var i = 0; i < _this4.drivers.data.length; i++) {
-        console.log(res.data.city);
-
-        if (_this4.drivers.data[i].id === res.data.id) {
-          _this4.drivers.data[i].identification_number = res.data.identification_number;
-          _this4.drivers.data[i].first_name = res.data.first_name;
-          _this4.drivers.data[i].last_name = res.data.last_name;
-          _this4.drivers.data[i].phone_number = res.data.phone_number;
-          _this4.drivers.data[i].second_name = res.data.second_name;
-          _this4.drivers.data[i].address = res.data.address;
-          _this4.drivers.data[i].status = res.data.status;
-          _this4.drivers.data[i].city.city_name = res.data.city.city_name;
+      for (var i = 0; i < _this5.drivers.data.length; i++) {
+        if (_this5.drivers.data[i].id === res.data.id) {
+          _this5.drivers.data[i].identification_number = res.data.identification_number;
+          _this5.drivers.data[i].first_name = res.data.first_name;
+          _this5.drivers.data[i].last_name = res.data.last_name;
+          _this5.drivers.data[i].phone_number = res.data.phone_number;
+          _this5.drivers.data[i].second_name = res.data.second_name;
+          _this5.drivers.data[i].address = res.data.address;
+          _this5.drivers.data[i].status = res.data.status;
+          _this5.drivers.data[i].city.city_name = res.data.city.city_name;
         }
       }
     });
@@ -2536,6 +2571,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2613,6 +2653,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _OwnersViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./OwnersViewComponent */ "./resources/js/components/owners/OwnersViewComponent.vue");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 //
@@ -2766,11 +2807,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "OwnersComponent",
+  components: {
+    ownersViewComponent: _OwnersViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
   data: function data() {
     return {
-      owners: [],
+      owners: {},
       cities: [],
       editmode: false,
       form: new Form({
@@ -2781,18 +2834,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         last_name: '',
         address: '',
         phone_number: '',
-        city_id: ''
+        city_id: '',
+        city: []
       })
     };
   },
   methods: _defineProperty({
     /**
-     * Load all owners
+     * Load paginate owners
      */
-    loadOwners: function loadOwners() {
+    getResults: function getResults() {
       var _this = this;
 
-      axios.get("api/owners").then(function (res) {
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      axios.get("api/get-owner-paginate?=page=".concat(page)).then(function (res) {
         _this.owners = res.data;
       });
     },
@@ -2803,8 +2858,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     loadCities: function loadCities() {
       var _this2 = this;
 
-      axios.get("api/cities").then(function (res) {
+      axios.get("api/city").then(function (res) {
         _this2.cities = res.data;
+        console.log(_this2.cities);
       });
     },
 
@@ -2826,9 +2882,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.form.post('api/owners').then(function () {
         vm.$emit('afterCreate');
         $('#addOwners').modal('hide');
-        toast.fire('Success!', 'Owner Created in successfully.', 'success');
-      })["catch"](function () {
-        toast.fire('Uops!', 'Complete all fields!', 'warning');
+        toast.fire('Success!', res.data.message, 'success');
+      })["catch"](function (error) {
+        toast.fire('Uops!', error.response.message, 'warning');
       });
     },
 
@@ -2839,10 +2895,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.form.put('api/owners/' + this.form.id).then(function (res) {
         // success
         $('#addOwners').modal('hide');
-        toast.fire('Updated!', 'User: ' + res.data.first_name.toUpperCase() + ' has been updated.', 'success');
-        vm.$emit('afterUpdate', res);
+        toast.fire('Updated!', res.data.message, 'success');
+        vm.$emit('afterUpdate', res.data);
       })["catch"](function () {
-        toast.fire('Error!', 'There was something wronge.', 'error');
+        toast.fire('Error!', error.response.message, 'error');
       });
     },
 
@@ -2854,19 +2910,43 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this3 = this;
 
       swal.fire({
-        title: 'Are you sure?',
+        title: 'Do you want to continue?',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Delete'
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Delete',
+        reverseButtons: true
       }).then(function (result) {
         // Send request to the server
         if (result.value) {
-          _this3.form["delete"]('api/owners/' + id).then(function () {
-            toast.fire('Success!', 'User has been deleted.', 'success');
-            vm.$emit('afterCreate');
-          })["catch"](function () {
-            toast.fire('Error!', 'There was something wronge.', 'error');
+          _this3.form["delete"]("api/owners/".concat(id)).then(function (res) {
+            toast.fire('Success!', res.data.message, 'success');
+            vm.$emit('afterUpdate', res.data);
+          })["catch"](function (error) {
+            toast.fire('Error!', error.response.data.message, 'error');
+          });
+        }
+      });
+    },
+
+    /**
+     *Active status of driver
+     */
+    activeOwner: function activeOwner(id) {
+      swal.fire({
+        title: 'Do you want to continue?',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirm',
+        reverseButtons: true
+      }).then(function (result) {
+        if (result.value) {
+          axios.get("api/owners/".concat(id, "/edit")).then(function (res) {
+            toast.fire('Success', res.data.message, 'success');
+            vm.$emit('afterUpdate', res.data);
+          })["catch"](function (error) {
+            toast.fire('Error!', error.response.message, 'error');
           });
         }
       });
@@ -2896,42 +2976,89 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   created: function created() {
     var _this4 = this;
 
-    this.loadOwners();
+    this.getResults();
     this.loadCities();
     vm.$on('afterCreate', function () {
-      _this4.loadOwners();
+      _this4.getResult();
     }); //event
 
     vm.$on('afterUpdate', function (res) {
-      var index = _this4.owners.findIndex(function (itemSearch) {
-        return itemSearch.id === res.data.id;
-      });
+      console.log(res.data.city);
 
-      _this4.owners[index].identification_number = res.data.identification_number;
-      _this4.owners[index].first_name = res.data.first_name;
-      _this4.owners[index].last_name = res.data.last_name;
-      _this4.owners[index].phone_number = res.data.phone_number;
-      _this4.owners[index].second_name = res.data.second_name;
-      _this4.owners[index].address = res.data.address;
-      _this4.owners[index].cities.city_name = res.data.cities.city_name;
+      for (var i = 0; i < _this4.owners.data.length; i++) {
+        if (_this4.owners.data[i].id === res.data.id) {
+          _this4.owners.data[i].identification_number = res.data.identification_number;
+          _this4.owners.data[i].first_name = res.data.first_name;
+          _this4.owners.data[i].last_name = res.data.last_name;
+          _this4.owners.data[i].phone_number = res.data.phone_number;
+          _this4.owners.data[i].second_name = res.data.second_name;
+          _this4.owners.data[i].address = res.data.address;
+          _this4.owners.data[i].status = res.data.status;
+          _this4.owners.data[i].city.city_name = res.data.city.city_name;
+        }
+      }
     });
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/pdf/PdfComponent.vue?vue&type=script&lang=js&":
-/*!***************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/pdf/PdfComponent.vue?vue&type=script&lang=js& ***!
-  \***************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/owners/OwnersViewComponent.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/owners/OwnersViewComponent.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2942,32 +3069,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: "PdfComponent",
+  name: "OwnersViewComponent",
+  created: function created() {
+    this.loadViewOwner();
+  },
+  data: function data() {
+    return {
+      owner: []
+    };
+  },
   methods: {
-    downloadCoverLetter: function downloadCoverLetter() {
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function downloadCoverLetter$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              axios({
-                url: '/imprimir-pdf',
-                method: 'GET',
-                responseType: 'blob' // important
+    loadViewOwner: function loadViewOwner() {
+      var _this = this;
 
-              }).then(function (response) {
-                var url = window.URL.createObjectURL(new Blob([response.data]));
-                var link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'file.pdf');
-                document.body.appendChild(link);
-                link.click();
-              });
-
-            case 1:
-            case "end":
-              return _context.stop();
-          }
-        }
+      var id = this.$route.params.id;
+      axios.get("api/owners/".concat(id)).then(function (res) {
+        console.log(res.data);
+        _this.owner = res.data;
       });
     }
   }
@@ -63364,13 +63482,34 @@ var render = function() {
                     }
                   },
                   [
-                    _vm._v(
-                      "Add\n                            new\n                            "
-                    ),
+                    _vm._v("Add new\n                            "),
                     _c("i", { staticClass: "fas fa-user-plus" })
                   ]
                 )
-              ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "card-tools",
+                  staticStyle: { "margin-right": "10px" }
+                },
+                [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-block btn-danger",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.downloadPdf()
+                        }
+                      }
+                    },
+                    [_c("i", { staticClass: "fas fa-file-pdf" })]
+                  )
+                ]
+              )
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "card-body table-responsive p-0" }, [
@@ -64115,6 +64254,38 @@ var render = function() {
           _vm._v(" "),
           _c("div", { staticClass: "form-group row" }, [
             _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Identification")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.driver.identification_number,
+                    expression: "driver.identification_number"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.driver.identification_number },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(
+                      _vm.driver,
+                      "identification_number",
+                      $event.target.value
+                    )
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
               _vm._v("Address")
             ]),
             _vm._v(" "),
@@ -64140,8 +64311,10 @@ var render = function() {
                   }
                 }
               })
-            ]),
-            _vm._v(" "),
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group row" }, [
             _c("label", { staticClass: "col-sm-2 col-form-label" }, [
               _vm._v("Phone number")
             ]),
@@ -64168,10 +64341,8 @@ var render = function() {
                   }
                 }
               })
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row" }, [
+            ]),
+            _vm._v(" "),
             _c("label", { staticClass: "col-sm-2 col-form-label" }, [
               _vm._v("City")
             ]),
@@ -64217,7 +64388,7 @@ var render = function() {
           },
           [
             _c("i", { staticClass: "fas fa-arrow-circle-left" }),
-            _vm._v(" Back")
+            _vm._v(" Back\n            ")
           ]
         )
       ])
@@ -64296,21 +64467,15 @@ var render = function() {
                 _vm._v(" "),
                 _c(
                   "tbody",
-                  _vm._l(_vm.owners, function(owner) {
+                  _vm._l(_vm.owners.data, function(owner) {
                     return _c("tr", { key: owner.id }, [
                       _c("td", [_vm._v(_vm._s(owner.identification_number))]),
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(owner.first_name))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(owner.second_name))]),
-                      _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(owner.last_name))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(owner.address))]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(owner.phone_number))]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(owner.city_id))]),
+                      _c("td", [_vm._v(_vm._s(owner.city.city_name))]),
                       _vm._v(" "),
                       _c("td", [
                         _vm._v(
@@ -64318,41 +64483,101 @@ var render = function() {
                         )
                       ]),
                       _vm._v(" "),
-                      _c("td", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.editModal(owner)
+                      _c(
+                        "td",
+                        [
+                          owner.status
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary btn-sm",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.editModal(owner)
+                                    }
+                                  }
+                                },
+                                [_c("i", { staticClass: "fa fa-edit blue" })]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          owner.status
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-danger btn-sm",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.deleteOwner(owner.id)
+                                    }
+                                  }
+                                },
+                                [_c("i", { staticClass: "fa fa-trash red" })]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          !owner.status
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-success btn-sm",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.activeOwner(owner.id)
+                                    }
+                                  }
+                                },
+                                [_c("i", { staticClass: "fas fa-exclamation" })]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c(
+                            "router-link",
+                            {
+                              attrs: {
+                                to: {
+                                  name: "ownerView",
+                                  params: { id: owner.id }
+                                }
                               }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-edit blue" })]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.deleteOwner(owner.id)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-trash red" })]
-                        )
-                      ])
+                            },
+                            [
+                              owner.status
+                                ? _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-success btn-sm",
+                                      attrs: { type: "button" }
+                                    },
+                                    [_c("i", { staticClass: "fas fa-eye" })]
+                                  )
+                                : _vm._e()
+                            ]
+                          )
+                        ],
+                        1
+                      )
                     ])
                   }),
                   0
                 )
               ])
-            ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "card-footer" },
+              [
+                _c("pagination", {
+                  attrs: { data: _vm.owners },
+                  on: { "pagination-change-page": _vm.getResults }
+                })
+              ],
+              1
+            )
           ])
         ]
       )
@@ -64708,15 +64933,15 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.form.city,
-                                expression: "form.city"
+                                value: _vm.form.city_id,
+                                expression: "form.city_id"
                               }
                             ],
                             staticClass: "form-control",
                             class: {
                               "is-invalid": _vm.form.errors.has("city_id")
                             },
-                            attrs: { name: "role_id", id: "city_id" },
+                            attrs: { name: "city_id", id: "city_id" },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -64729,7 +64954,7 @@ var render = function() {
                                   })
                                 _vm.$set(
                                   _vm.form,
-                                  "city",
+                                  "city_id",
                                   $event.target.multiple
                                     ? $$selectedVal
                                     : $$selectedVal[0]
@@ -64843,13 +65068,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("First Name")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Second Name")]),
-        _vm._v(" "),
         _c("th", [_vm._v("Last name")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Address")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Phone Number")]),
         _vm._v(" "),
         _c("th", [_vm._v("City")]),
         _vm._v(" "),
@@ -64896,10 +65115,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/pdf/PdfComponent.vue?vue&type=template&id=2ef9e493&scoped=true&":
-/*!*******************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/pdf/PdfComponent.vue?vue&type=template&id=2ef9e493&scoped=true& ***!
-  \*******************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/owners/OwnersViewComponent.vue?vue&type=template&id=a4f25dd8&scoped=true&":
+/*!*****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/owners/OwnersViewComponent.vue?vue&type=template&id=a4f25dd8&scoped=true& ***!
+  \*****************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -64912,22 +65131,254 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
-    _c("h1", [_vm._v("Generación PDF")]),
-    _vm._v(" "),
-    _c(
-      "button",
-      {
-        on: {
-          click: function($event) {
-            return _vm.downloadCoverLetter()
-          }
-        }
-      },
-      [_vm._v("Imprimir")]
-    )
+    _c("div", { staticClass: "card" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c("div", { staticClass: "card-body" }, [
+        _c("div", { staticClass: "tab-content" }, [
+          _c("div", { staticClass: "form-group row" }, [
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Name")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.owner.first_name + "   " + _vm.owner.second_name,
+                    expression: "owner.first_name +'   '+ owner.second_name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: {
+                  value: _vm.owner.first_name + "   " + _vm.owner.second_name
+                },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(
+                      _vm.owner.first_name + "   " + _vm.owner,
+                      "second_name",
+                      $event.target.value
+                    )
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Last Name")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.owner.last_name,
+                    expression: "owner.last_name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.owner.last_name },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.owner, "last_name", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group row" }, [
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Identification")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.owner.identification_number,
+                    expression: "owner.identification_number"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.owner.identification_number },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(
+                      _vm.owner,
+                      "identification_number",
+                      $event.target.value
+                    )
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Address")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.owner.address,
+                    expression: "owner.address"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.owner.address },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.owner, "address", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group row" }, [
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("Phone number")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.owner.phone_number,
+                    expression: "owner.phone_number"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.owner.phone_number },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.owner, "phone_number", $event.target.value)
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+              _vm._v("City")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.owner.city.city_name,
+                    expression: "owner.city.city_name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", readonly: "" },
+                domProps: { value: _vm.owner.city.city_name },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.owner.city, "city_name", $event.target.value)
+                  }
+                }
+              })
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _vm._m(1),
+      _vm._v(" "),
+      _vm._m(2),
+      _vm._v(" "),
+      _c("div", { staticClass: "card-footer bg-transparent border-dark" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-primary",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                return _vm.$router.go(-1)
+              }
+            }
+          },
+          [
+            _c("i", { staticClass: "fas fa-arrow-circle-left" }),
+            _vm._v(" Back\n            ")
+          ]
+        )
+      ])
+    ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card-header text-white bg-dark" }, [
+      _c("span", [
+        _c("i", { staticClass: "fas fa-user-alt-slash" }),
+        _vm._v(" Driver Information")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card-header text-white bg-dark" }, [
+      _c("span", [
+        _c("i", { staticClass: "fas fa-car" }),
+        _vm._v(" Vehicle Information")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card-body" }, [
+      _c("div", { staticClass: "tab-content" })
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -82226,17 +82677,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/pdf/PdfComponent.vue":
-/*!******************************************************!*\
-  !*** ./resources/js/components/pdf/PdfComponent.vue ***!
-  \******************************************************/
+/***/ "./resources/js/components/owners/OwnersViewComponent.vue":
+/*!****************************************************************!*\
+  !*** ./resources/js/components/owners/OwnersViewComponent.vue ***!
+  \****************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _PdfComponent_vue_vue_type_template_id_2ef9e493_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PdfComponent.vue?vue&type=template&id=2ef9e493&scoped=true& */ "./resources/js/components/pdf/PdfComponent.vue?vue&type=template&id=2ef9e493&scoped=true&");
-/* harmony import */ var _PdfComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PdfComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/pdf/PdfComponent.vue?vue&type=script&lang=js&");
+/* harmony import */ var _OwnersViewComponent_vue_vue_type_template_id_a4f25dd8_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./OwnersViewComponent.vue?vue&type=template&id=a4f25dd8&scoped=true& */ "./resources/js/components/owners/OwnersViewComponent.vue?vue&type=template&id=a4f25dd8&scoped=true&");
+/* harmony import */ var _OwnersViewComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OwnersViewComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/owners/OwnersViewComponent.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -82246,50 +82697,50 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _PdfComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _PdfComponent_vue_vue_type_template_id_2ef9e493_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _PdfComponent_vue_vue_type_template_id_2ef9e493_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _OwnersViewComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _OwnersViewComponent_vue_vue_type_template_id_a4f25dd8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _OwnersViewComponent_vue_vue_type_template_id_a4f25dd8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
-  "2ef9e493",
+  "a4f25dd8",
   null
   
 )
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/pdf/PdfComponent.vue"
+component.options.__file = "resources/js/components/owners/OwnersViewComponent.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/pdf/PdfComponent.vue?vue&type=script&lang=js&":
-/*!*******************************************************************************!*\
-  !*** ./resources/js/components/pdf/PdfComponent.vue?vue&type=script&lang=js& ***!
-  \*******************************************************************************/
+/***/ "./resources/js/components/owners/OwnersViewComponent.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************!*\
+  !*** ./resources/js/components/owners/OwnersViewComponent.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_PdfComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./PdfComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/pdf/PdfComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_PdfComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_OwnersViewComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./OwnersViewComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/owners/OwnersViewComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_OwnersViewComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/pdf/PdfComponent.vue?vue&type=template&id=2ef9e493&scoped=true&":
-/*!*************************************************************************************************!*\
-  !*** ./resources/js/components/pdf/PdfComponent.vue?vue&type=template&id=2ef9e493&scoped=true& ***!
-  \*************************************************************************************************/
+/***/ "./resources/js/components/owners/OwnersViewComponent.vue?vue&type=template&id=a4f25dd8&scoped=true&":
+/*!***********************************************************************************************************!*\
+  !*** ./resources/js/components/owners/OwnersViewComponent.vue?vue&type=template&id=a4f25dd8&scoped=true& ***!
+  \***********************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PdfComponent_vue_vue_type_template_id_2ef9e493_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./PdfComponent.vue?vue&type=template&id=2ef9e493&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/pdf/PdfComponent.vue?vue&type=template&id=2ef9e493&scoped=true&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PdfComponent_vue_vue_type_template_id_2ef9e493_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_OwnersViewComponent_vue_vue_type_template_id_a4f25dd8_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./OwnersViewComponent.vue?vue&type=template&id=a4f25dd8&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/owners/OwnersViewComponent.vue?vue&type=template&id=a4f25dd8&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_OwnersViewComponent_vue_vue_type_template_id_a4f25dd8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PdfComponent_vue_vue_type_template_id_2ef9e493_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_OwnersViewComponent_vue_vue_type_template_id_a4f25dd8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -82701,14 +83152,15 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_router__WEBPACK_IMPORTED_MODU
     path: '/owners',
     component: __webpack_require__(/*! ./components/owners/OwnersComponent */ "./resources/js/components/owners/OwnersComponent.vue")["default"]
   }, {
+    path: '/owner/:id',
+    name: 'ownerView',
+    component: __webpack_require__(/*! ./components/owners/OwnersViewComponent */ "./resources/js/components/owners/OwnersViewComponent.vue")["default"]
+  }, {
     path: '/vehicles',
     component: __webpack_require__(/*! ./components/vehicles/VehiclesComponent */ "./resources/js/components/vehicles/VehiclesComponent.vue")["default"]
   }, {
     path: '/cities',
     component: __webpack_require__(/*! ./components/cities/CitiesComponent */ "./resources/js/components/cities/CitiesComponent.vue")["default"]
-  }, {
-    path: '/reportes',
-    component: __webpack_require__(/*! ./components/pdf/PdfComponent */ "./resources/js/components/pdf/PdfComponent.vue")["default"]
   }, {
     path: '*',
     component: __webpack_require__(/*! ./views/404 */ "./resources/js/views/404.vue")["default"]

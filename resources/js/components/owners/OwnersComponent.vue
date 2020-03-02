@@ -20,37 +20,45 @@
                             <tr>
                                 <th>Identification Number</th>
                                 <th>First Name</th>
-                                <th>Second Name</th>
                                 <th>Last name</th>
-                                <th>Address</th>
-                                <th>Phone Number</th>
                                 <th>City</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="owner in owners" :key="owner.id">
+                            <tr v-for="owner in owners.data" :key="owner.id">
                                 <td>{{owner.identification_number}}</td>
                                 <td>{{owner.first_name}}</td>
-                                <td>{{owner.second_name}}</td>
                                 <td>{{owner.last_name}}</td>
-                                <td>{{owner.address}}</td>
-                                <td>{{owner.phone_number}}</td>
-                                <td>{{owner.city_id}}</td>
+                                <td>{{owner.city.city_name}}</td>
                                 <td>{{owner.status === 1 ? 'Activo' : 'Desactivo'}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(owner)">
+                                    <button v-if="owner.status" type="button" class="btn btn-primary btn-sm"
+                                            v-on:click="editModal(owner)">
                                         <i class="fa fa-edit blue"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm"
+                                    <button v-if="owner.status" type="button" class="btn btn-danger btn-sm"
                                             v-on:click="deleteOwner(owner.id)">
                                         <i class="fa fa-trash red"></i>
                                     </button>
+                                    <button v-if="!owner.status" type="button" class="btn btn-success btn-sm"
+                                            v-on:click="activeOwner(owner.id)">
+                                        <i class="fas fa-exclamation"></i>
+                                    </button>
+                                    <router-link :to="{name:'ownerView',params:{id:owner.id}}">
+                                        <button v-if="owner.status" type="button" class="btn btn-success btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </router-link>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <!-- pagination --->
+                    <div class="card-footer">
+                        <pagination :data="owners" @pagination-change-page="getResults"></pagination>
                     </div>
                 </div>
             </div>
@@ -63,10 +71,10 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" v-show="!editmode" id="addOwnersLabel">Add New <i
-                                class="fas fa-user"></i>
+                            class="fas fa-user"></i>
                         </h5>
                         <h5 class="modal-title" v-show="editmode" id="addOwnersLabel">Update Owner <i
-                                class="fas fa-user"></i></h5>
+                            class="fas fa-user"></i></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -121,7 +129,7 @@
                             </div>
 
                             <div class="form-group">
-                                <select name="role_id" v-model="form.city" id="city_id" class="form-control"
+                                <select name="city_id" v-model="form.city_id" id="city_id" class="form-control"
                                         :class="{ 'is-invalid': form.errors.has('city_id') }">
                                     <option value="" disabled selected>Select City</option>
                                     <option v-for="(city,key) in cities" :value="city.id">
@@ -133,11 +141,11 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close <i
-                                    class="fas fa-times"></i></button>
+                                class="fas fa-times"></i></button>
                             <button v-show="editmode" type="submit" class="btn btn-success">Save <i
-                                    class="fas fa-check"></i></button>
+                                class="fas fa-check"></i></button>
                             <button v-show="!editmode" type="submit" class="btn btn-success">Create <i
-                                    class="fas fa-plus"></i></button>
+                                class="fas fa-plus"></i></button>
                         </div>
 
                     </form>
@@ -150,11 +158,16 @@
 </template>
 
 <script>
+    import ownersViewComponent from './OwnersViewComponent';
+
     export default {
         name: "OwnersComponent",
+        components: {
+            ownersViewComponent
+        },
         data() {
             return {
-                owners: [],
+                owners: {},
                 cities: [],
                 editmode: false,
                 form: new Form({
@@ -166,27 +179,30 @@
                     address: '',
                     phone_number: '',
                     city_id: '',
+                    city: [],
                 })
             }
         },
         methods: {
 
             /**
-             * Load all owners
+             * Load paginate owners
              */
-            loadOwners() {
-                axios.get(`api/owners`)
-                    .then((res) => {
-                        this.owners = res.data
+            getResults(page = 1) {
+                axios.get(`api/get-owner-paginate?=page=${page}`)
+                    .then(res => {
+                        this.owners = res.data;
                     })
+
             },
             /**
              * Load all owners
              */
             loadCities() {
-                axios.get(`api/cities`)
+                axios.get(`api/city`)
                     .then((res) => {
-                        this.cities = res.data
+                        this.cities = res.data;
+                        console.log(this.cities)
                     })
             },
 
@@ -209,10 +225,10 @@
                     .then(() => {
                         vm.$emit('afterCreate');
                         $('#addOwners').modal('hide')
-                        toast.fire('Success!', 'Owner Created in successfully.', 'success');
+                        toast.fire('Success!', res.data.message, 'success');
                     })
-                    .catch(() => {
-                        toast.fire('Uops!', 'Complete all fields!', 'warning');
+                    .catch((error) => {
+                        toast.fire('Uops!', error.response.message, 'warning');
                     })
             },
 
@@ -224,10 +240,10 @@
                     .then((res) => {
                         // success
                         $('#addOwners').modal('hide');
-                        toast.fire('Updated!', 'User: ' + res.data.first_name.toUpperCase() + ' has been updated.', 'success')
-                        vm.$emit('afterUpdate', res);
+                        toast.fire('Updated!', res.data.message, 'success');
+                        vm.$emit('afterUpdate', res.data);
                     }).catch(() => {
-                    toast.fire('Error!', 'There was something wronge.', 'error')
+                    toast.fire('Error!', error.response.message, 'error')
                 });
             },
 
@@ -237,24 +253,47 @@
              */
             deleteOwner(id) {
                 swal.fire({
-                    title: 'Are you sure?',
+                    title: 'Do you want to continue?',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Delete'
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Delete',
+                    reverseButtons: true
                 }).then((result) => {
                     // Send request to the server
                     if (result.value) {
-                        this.form.delete('api/owners/' + id).then(() => {
-                            toast.fire('Success!', 'User has been deleted.', 'success');
-                            vm.$emit('afterCreate');
-                        }).catch(() => {
-                            toast.fire('Error!', 'There was something wronge.', 'error');
+                        this.form.delete(`api/owners/${id}`).then((res) => {
+                            toast.fire('Success!', res.data.message, 'success');
+                            vm.$emit('afterUpdate', res.data);
+                        }).catch((error) => {
+                            toast.fire('Error!', error.response.data.message, 'error');
                         });
                     }
                 })
             },
-
+            /**
+             *Active status of driver
+             */
+            activeOwner(id) {
+                swal.fire({
+                    title: 'Do you want to continue?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Confirm',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value) {
+                        axios.get(`api/owners/${id}/edit`)
+                            .then((res) => {
+                                toast.fire('Success', res.data.message, 'success');
+                                vm.$emit('afterUpdate', res.data);
+                            }).catch((error) => {
+                            toast.fire('Error!', error.response.message, 'error')
+                        })
+                    }
+                })
+            },
 
             /**
              * Show and complete owner info
@@ -283,21 +322,26 @@
          * Methods first charge
          */
         created() {
-            this.loadOwners();
+            this.getResults();
             this.loadCities();
             vm.$on('afterCreate', () => {
-                this.loadOwners();
+                this.getResult();
             });
             //event
             vm.$on('afterUpdate', (res) => {
-                const index = this.owners.findIndex(itemSearch => itemSearch.id === res.data.id);
-                this.owners[index].identification_number = res.data.identification_number;
-                this.owners[index].first_name = res.data.first_name;
-                this.owners[index].last_name = res.data.last_name;
-                this.owners[index].phone_number = res.data.phone_number;
-                this.owners[index].second_name = res.data.second_name;
-                this.owners[index].address = res.data.address;
-                this.owners[index].cities.city_name = res.data.cities.city_name
+                console.log(res.data.city)
+                for (var i = 0; i < this.owners.data.length; i++) {
+                    if (this.owners.data[i].id === res.data.id) {
+                        this.owners.data[i].identification_number = res.data.identification_number;
+                        this.owners.data[i].first_name = res.data.first_name;
+                        this.owners.data[i].last_name = res.data.last_name;
+                        this.owners.data[i].phone_number = res.data.phone_number;
+                        this.owners.data[i].second_name = res.data.second_name;
+                        this.owners.data[i].address = res.data.address;
+                        this.owners.data[i].status = res.data.status;
+                        this.owners.data[i].city.city_name = res.data.city.city_name;
+                    }
+                }
             })
         }
 

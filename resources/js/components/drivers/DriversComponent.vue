@@ -7,16 +7,20 @@
                         <h3 class="card-title"><i class="fas fa-user-alt-slash"></i> Driver List</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-block btn-outline-success"
-                                    v-on:click="newModal()">Add
-                                new
+                                    v-on:click="newModal()">Add new
                                 <i class="fas fa-user-plus"></i>
+                            </button>
+                        </div>
+                        <div class="card-tools" style="margin-right:10px">
+                            <button type="button" class="btn btn-block btn-danger"
+                                    v-on:click="downloadPdf()">
+                                <i class="fas fa-file-pdf"></i>
                             </button>
                         </div>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body table-responsive p-0">
                         <table class="table table-hover">
-
                             <thead>
                             <tr>
                                 <th>Identification Number</th>
@@ -64,7 +68,6 @@
                 </div>
             </div>
         </div>
-
         <!--Modal -->
         <div class="modal fade" id="addOwners" tabindex="-1" role="dialog" aria-labelledby="addOwnersLabel"
              aria-hidden="true">
@@ -152,7 +155,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
 </template>
@@ -184,6 +186,20 @@
             }
         },
         methods: {
+            async downloadPdf() {
+                axios({
+                    url: '/driver-pdf',
+                    method: 'GET',
+                    responseType: 'blob', // important
+                }).then((response) => {
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', 'drivers.pdf');
+                    document.body.appendChild(link);
+                    link.click();
+                });
+            },
             /**
              * Load Paginate drivers
              */
@@ -193,7 +209,6 @@
                         this.drivers = res.data
                     });
             },
-
             /**
              * Load all cities
              */
@@ -220,13 +235,13 @@
             create() {
                 this.editmode = false;
                 this.form.post('api/drivers')
-                    .then(() => {
-                        vm.$emit('afterCreate');
+                    .then((res) => {
+                        this.getResults();
                         $('#addOwners').modal('hide')
-                        toast.fire('Success!', 'Driver Created in successfully.', 'success');
+                        toast.fire('Success!', res.data.message, 'success');
                     })
-                    .catch(() => {
-                        toast.fire('Uops!', 'Complete all fields!', 'warning');
+                    .catch((error) => {
+                        toast.fire('Uops!', error.response.message, 'warning');
                     })
             },
 
@@ -259,9 +274,9 @@
                 }).then((result) => {
                     // Send request to the server
                     if (result.value) {
-                        this.form.delete('api/drivers/' + id)
+                        this.form.delete(`api/drivers/${id}`)
                             .then((res) => {
-                                toast.fire('Success!', 'User has been deleted.', 'success');
+                                toast.fire('Success!', res.data.message, 'success');
                                 vm.$emit('afterUpdate', res.data);
                             }).catch(error => {
                             toast.fire('Error!', error.response.data.message, 'error');
@@ -270,6 +285,9 @@
                 })
             },
 
+            /**
+             *Active status of driver
+             */
             activeDriver(id) {
                 swal.fire({
                     title: 'Do you want to continue?',
@@ -314,19 +332,17 @@
             },
         },
 
+
         /**
          * Methods first charge
          */
         created() {
             this.getResults();
             this.loadCities();
-            vm.$on('afterCreate', () => {
-                this.loadDrivers();
-            });
             //event
             vm.$on('afterUpdate', (res) => {
                 for (var i = 0; i < this.drivers.data.length; i++) {
-                    console.log(res.data.city)
+
                     if (this.drivers.data[i].id === res.data.id) {
                         this.drivers.data[i].identification_number = res.data.identification_number;
                         this.drivers.data[i].first_name = res.data.first_name;

@@ -40,16 +40,19 @@ export default new VueRouter({
             component: require('./components/owners/OwnersComponent').default
         },
         {
+            path:'/owner/:id',
+            name:'ownerView',
+            component: require('./components/owners/OwnersViewComponent').default
+
+        },
+        {
             path: '/vehicles',
             component: require('./components/vehicles/VehiclesComponent').default
         },
+
         {
             path: '/cities',
             component: require('./components/cities/CitiesComponent').default
-        },
-        {
-            path: '/reportes',
-            component: require('./components/pdf/PdfComponent').default
         },
         {
             path: '*',

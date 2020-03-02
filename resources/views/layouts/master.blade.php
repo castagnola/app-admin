@@ -86,13 +86,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </p>
                             </router-link>
                         </li>
+                        <li class="nav-item">
+                            <router-link to="/roles" class="nav-link">
+                                <i class=" nav-icon fas fa-user-tag"></i>
+                                <p>Roles</p>
+                            </router-link>
+                        </li>
                     @endcan
-                    <li class="nav-item">
-                        <router-link to="/roles" class="nav-link">
-                            <i class=" nav-icon fas fa-user-tag"></i>
-                            <p>Roles</p>
-                        </router-link>
-                    </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-cogs"></i>
@@ -101,12 +101,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
-
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <router-link to="/cities" class="nav-link">
                                     <i class="fas fa-city"></i>
                                     <p>Cities</p>
+                                </router-link>
+                            </li>
+                            <li class="nav-item">
+                                <router-link to="/owners" class="nav-link">
+                                    <i class="fas fa-user-tie"></i>
+                                    <p>Owner</p>
                                 </router-link>
                             </li>
                             <li class="nav-item">
@@ -121,19 +126,31 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     <p>Vehicles</p>
                                 </router-link>
                             </li>
+
+                        </ul>
+                    <li class="nav-item">
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-route"></i>
+                            <p>
+                                Travels
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <router-link to="/owners" class="nav-link">
-                                    <i class="fas fa-user-tie"></i>
-                                    <p>Owner</p>
-                                </router-link>
-                            </li>
-                            <li class="nav-item">
-                                <router-link to="/reportes" class="nav-link">
-                                    <i class="fas fa-file"></i>
-                                    <p>Reporte</p>
+                                <router-link to="/#" class="nav-link">
+                                    <i class="fas fa-road"></i>
+                                    <p>Routes</p>
                                 </router-link>
                             </li>
                         </ul>
+                    <li class="nav-item">
+                        <router-link to="/#" class="nav-link">
+                            <i class="fab fa-autoprefixer"></i>
+                            <p>Assignment of drivers</p>
+                        </router-link>
+                    </li>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('logout') }}"
