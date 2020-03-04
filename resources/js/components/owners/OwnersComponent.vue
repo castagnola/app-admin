@@ -11,6 +11,13 @@
                                 new
                                 <i class="fas fa-user-plus"></i>
                             </button>
+
+                        </div>
+                        <div class="card-tools" style="margin-right:10px">
+                            <button type="button" class="btn btn-block btn-danger"
+                                    v-on:click="downloadPdf()">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
                         </div>
                     </div>
                     <!-- /.card-header -->
@@ -184,6 +191,20 @@
             }
         },
         methods: {
+            async downloadPdf() {
+                axios({
+                    url: '/owner-pdf',
+                    method: 'GET',
+                    responseType: 'blob', // important
+                }).then((response) => {
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', 'owners.pdf');
+                    document.body.appendChild(link);
+                    link.click();
+                });
+            },
 
             /**
              * Load paginate owners
@@ -242,7 +263,7 @@
                         $('#addOwners').modal('hide');
                         toast.fire('Updated!', res.data.message, 'success');
                         vm.$emit('afterUpdate', res.data);
-                    }).catch(() => {
+                    }).catch((error) => {
                     toast.fire('Error!', error.response.message, 'error')
                 });
             },

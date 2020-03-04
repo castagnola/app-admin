@@ -8,6 +8,12 @@ use App\Http\Controllers\Controller;
 
 class VehiclesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -31,7 +37,7 @@ class VehiclesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -41,27 +47,29 @@ class VehiclesController extends Controller
             'placa' => 'required',
             'tipe_id' => 'required',
             'owner_id' => 'required',
-            'driver_id' => 'required',
             'brand' => 'required',
         ]);
+        try {
+            $vehicle = new Vehicle();
+            $vehicle->color = $request->color;
+            $vehicle->placa = $request->placa;
+            $vehicle->tipe_id = $request->tipe_id;
+            $vehicle->brand = $request->brand;
+            $vehicle->owner_id = $request->owner_id;
+            $vehicle->save();
 
-       $vehicle = new Vehicle();
-       $vehicle->color = $request->color;
-       $vehicle->placa = $request->placa;
-       $vehicle->tipe_id = $request->tipe_id;
-       $vehicle->brand = $request->brand;
-       $vehicle->owner_id = $request->owner_id;
-       $vehicle->driver_id = $request->driver_id;
-       $vehicle->save();
+            return response()->json(['message' => 'Vehicle: ' . $vehicle->placa . ', Created in successfully.'], 200);
 
-       return $vehicle;
+        } catch (\Exception $exception) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
 
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -72,19 +80,29 @@ class VehiclesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        //
+        try {
+
+            $vehicle = Vehicle::with('owner', 'tipeVehicle')->find($id);
+            $vehicle->status = 1;
+            $vehicle->update();
+
+            return response()->json(['message' => 'Vehicle: ' . $vehicle->placa . ', Created in successfully.', 'data' => $owner], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -94,34 +112,45 @@ class VehiclesController extends Controller
             'placa' => 'required',
             'tipe_id' => 'required',
             'owner_id' => 'required',
-            'driver_id' => 'required',
             'brand' => 'required',
         ]);
 
-        $vehicle = Vehicle::find($id);
-        $vehicle->color = $request->color;
-        $vehicle->placa = $request->placa;
-        $vehicle->tipe_id = $request->tipe_id;
-        $vehicle->brand = $request->brand;
-        $vehicle->owner_id = $request->owner_id;
-        $vehicle->driver_id = $request->driver_id;
-        $vehicle->update();
+        try {
 
-        return $vehicle;
+            $vehicle = Vehicle::find($id);
+            $vehicle->color = $request->color;
+            $vehicle->placa = $request->placa;
+            $vehicle->tipe_id = $request->tipe_id;
+            $vehicle->brand = $request->brand;
+            $vehicle->owner_id = $request->owner_id;
+            $vehicle->update();
+            $data = Vehicle::with('owner','tipeVehicle')->find($id);
+            return response()->json(['message' => 'Vehicle: ' . $vehicle->placa . ', has been updated.', 'data' => $data], 200);
+
+        } catch (\Exception $exception) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        $user = Vehicle::findOrFail($id);
+        try {
+            $vehicle = Owner::with('city')->find($id);
+            // delete soft
+            $vehicle->status = 0;
+            $vehicle->update();
+            return response()->json(['message' => 'Vehicle has been deleted.', 'data' => $vehicle], 200);
 
-        // delete the user
-        $user->status = 0;
-        $user->save();
+        } catch (\Exception $exception) {
+            return response()->json(['message' => 'There was something wronge.'], 500);
+
+        }
     }
 }

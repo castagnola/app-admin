@@ -342,7 +342,6 @@
             //event
             vm.$on('afterUpdate', (res) => {
                 for (var i = 0; i < this.drivers.data.length; i++) {
-
                     if (this.drivers.data[i].id === res.data.id) {
                         this.drivers.data[i].identification_number = res.data.identification_number;
                         this.drivers.data[i].first_name = res.data.first_name;
@@ -351,7 +350,8 @@
                         this.drivers.data[i].second_name = res.data.second_name;
                         this.drivers.data[i].address = res.data.address;
                         this.drivers.data[i].status = res.data.status;
-                        this.drivers.data[i].city.city_name = res.data.city.city_name
+                        this.drivers.data[i].city.city_name = res.data.city.city_name;
+                        break;
                     }
                 }
 

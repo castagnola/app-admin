@@ -31,3 +31,4 @@ Route::get('login/{service}/callback','Auth\LoginController@handleProviderCallba
 
 Route::name('imprimir')->get('/imprimir-pdf','Controller@imprimir');
 Route::get('driver-pdf','PdfController\DowloadPdfController@driverPdfDowload');
+Route::get('owner-pdf','PdfController\DowloadPdfController@ownerPdfDowload');

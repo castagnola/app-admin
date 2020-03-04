@@ -277,6 +277,7 @@
                         this.cities.data[i].city_name = res.data.city_name;
                         this.cities.data[i].departament.departament_name = res.data.departament.departament_name;
                         this.cities.data[i].status = res.data.status;
+                        break;
                     }
                 }
             })

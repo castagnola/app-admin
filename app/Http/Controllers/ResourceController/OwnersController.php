@@ -59,7 +59,7 @@ class OwnersController extends Controller
             $owner->last_name = $request->last_name;
             $owner->address = $request->address;
             $owner->phone_number = $request->phone_number;
-            $owner->city_id = 1;
+            $owner->city_id = $request->city_id;
             $owner->status = 1;
             $owner->save();
             return response()->json(['message' => 'Owner: ' . $owner->first_name . ' ' . $owner->last_name . ', Created in successfully.'], 200);
@@ -78,7 +78,7 @@ class OwnersController extends Controller
      */
     public function show($id)
     {
-        return Owner::with('city')->find($id);
+        return Owner::with('city','vehicle.tipeVehicle')->find($id);
     }
 
     /**

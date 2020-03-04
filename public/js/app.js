@@ -2166,6 +2166,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           _this4.cities.data[i].city_name = res.data.city_name;
           _this4.cities.data[i].departament.departament_name = res.data.departament.departament_name;
           _this4.cities.data[i].status = res.data.status;
+          break;
         }
       }
     });
@@ -2554,6 +2555,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           _this5.drivers.data[i].address = res.data.address;
           _this5.drivers.data[i].status = res.data.status;
           _this5.drivers.data[i].city.city_name = res.data.city.city_name;
+          break;
         }
       }
     });
@@ -2653,9 +2655,20 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _OwnersViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./OwnersViewComponent */ "./resources/js/components/owners/OwnersViewComponent.vue");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _OwnersViewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OwnersViewComponent */ "./resources/js/components/owners/OwnersViewComponent.vue");
+
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2819,7 +2832,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "OwnersComponent",
   components: {
-    ownersViewComponent: _OwnersViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
+    ownersViewComponent: _OwnersViewComponent__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
@@ -2840,6 +2853,33 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     };
   },
   methods: _defineProperty({
+    downloadPdf: function downloadPdf() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function downloadPdf$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              axios({
+                url: '/owner-pdf',
+                method: 'GET',
+                responseType: 'blob' // important
+
+              }).then(function (response) {
+                var url = window.URL.createObjectURL(new Blob([response.data]));
+                var link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'owners.pdf');
+                document.body.appendChild(link);
+                link.click();
+              });
+
+            case 1:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
+    },
+
     /**
      * Load paginate owners
      */
@@ -2897,7 +2937,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         $('#addOwners').modal('hide');
         toast.fire('Updated!', res.data.message, 'success');
         vm.$emit('afterUpdate', res.data);
-      })["catch"](function () {
+      })["catch"](function (error) {
         toast.fire('Error!', error.response.message, 'error');
       });
     },
@@ -3068,6 +3108,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "OwnersViewComponent",
   created: function created() {
@@ -3084,8 +3149,8 @@ __webpack_require__.r(__webpack_exports__);
 
       var id = this.$route.params.id;
       axios.get("api/owners/".concat(id)).then(function (res) {
-        console.log(res.data);
         _this.owner = res.data;
+        console.log(_this.owner.vehicle.length);
       });
     }
   }
@@ -3843,17 +3908,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "VehiclesComponent",
   data: function data() {
     return {
       editmode: false,
-      vehicles: [],
+      vehicles: {},
       owners: [],
       drivers: [],
       tipes: [],
@@ -3864,19 +3924,19 @@ __webpack_require__.r(__webpack_exports__);
         brand: '',
         tipe_vehicle: '',
         owner_id: '',
-        driver_id: '',
         tipe_id: ''
       })
     };
   },
   methods: {
     /**
-     * Load all drivers
+     * Load paginate vehicles
      */
-    loadAllVehicles: function loadAllVehicles() {
+    getResults: function getResults() {
       var _this = this;
 
-      axios.get("api/vehicle").then(function (res) {
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      axios.get("api/get-vehicle-paginate?=page=".concat(page)).then(function (res) {
         _this.vehicles = res.data;
       });
     },
@@ -3884,30 +3944,30 @@ __webpack_require__.r(__webpack_exports__);
     /**
      *Create user
      */
-    createUser: function createUser() {
+    create: function create() {
       this.editmode = false;
-      this.form.post('api/vehicle').then(function () {
+      this.form.post('api/vehicle').then(function (res) {
         vm.$emit('afterCreate');
         $('#addUser').modal('hide');
-        toast.fire('Success!', 'Vehicle Created in successfully.', 'success');
-      })["catch"](function () {
-        toast.fire('Uops!', 'Complete all fields!', 'warning');
+        toast.fire('Success!', res.data.message, 'success');
+      })["catch"](function (error) {
+        toast.fire('Uops!', error.response.message, 'warning');
       });
     },
 
     /**
      * update informatio vehicle
      */
-    updateUser: function updateUser() {
+    update: function update() {
       console.log(this.form); // console.log('Editing data');
 
       this.form.put('api/vehicle/' + this.form.id).then(function (res) {
         // success
         $('#addUser').modal('hide');
-        toast.fire('Updated!', 'Vehicle: ' + res.data.placa.toUpperCase() + ' has been updated.', 'success');
-        vm.$emit('afterUpdate', res);
-      })["catch"](function () {
-        toast.fire('Error!', 'There was something wronge.', 'error');
+        toast.fire('Updated!', res.data.message, 'success');
+        vm.$emit('afterUpdate', res.data);
+      })["catch"](function (error) {
+        toast.fire('Error!', error.response.message, 'error');
       });
     },
 
@@ -3915,23 +3975,47 @@ __webpack_require__.r(__webpack_exports__);
      * Change status user
      * @param id
      */
-    deleteUser: function deleteUser(id) {
+    deleteVehicle: function deleteVehicle(id) {
       var _this2 = this;
 
       swal.fire({
-        title: 'Are you sure?',
+        title: 'Do you want to continue?',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Delete'
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Delete',
+        reverseButtons: true
       }).then(function (result) {
         // Send request to the server
         if (result.value) {
           _this2.form["delete"]('api/vehicle/' + id).then(function () {
-            toast.fire('Success!', 'Vehicle has been deleted.', 'success');
+            toast.fire('Success!', res.data.message, 'success');
             vm.$emit('afterCreate');
-          })["catch"](function () {
-            toast.fire('Error!', 'There was something wronge.', 'error');
+          })["catch"](function (error) {
+            toast.fire('Error!', error.response.data.message, 'error');
+          });
+        }
+      });
+    },
+
+    /**
+     *Active status of driver
+     */
+    activeVehicle: function activeVehicle(id) {
+      swal.fire({
+        title: 'Do you want to continue?',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirm',
+        reverseButtons: true
+      }).then(function (result) {
+        if (result.value) {
+          axios.get("api/owners/".concat(id, "/edit")).then(function (res) {
+            toast.fire('Success', res.data.message, 'success');
+            vm.$emit('afterUpdate', res.data);
+          })["catch"](function (error) {
+            toast.fire('Error!', error.response.message, 'error');
           });
         }
       });
@@ -3979,17 +4063,6 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("api/owners").then(function (res) {
         _this4.owners = res.data;
       });
-    },
-
-    /**
-     * Load all drivers
-     */
-    loadDrivers: function loadDrivers() {
-      var _this5 = this;
-
-      axios.get("api/drivers").then(function (res) {
-        _this5.drivers = res.data;
-      });
     }
   },
 
@@ -3997,23 +4070,28 @@ __webpack_require__.r(__webpack_exports__);
    * Methods first charge
    */
   created: function created() {
-    var _this6 = this;
+    var _this5 = this;
 
+    this.getResults();
     this.loadVehicles();
-    this.loadDrivers();
     this.loadOwners();
-    this.loadAllVehicles();
     vm.$on('afterCreate', function () {
-      _this6.loadVehicles();
+      _this5.loadVehicles();
     }); //event
 
     vm.$on('afterUpdate', function (res) {
-      var index = _this6.vehicles.findIndex(function (itemSearch) {
-        return itemSearch.id === res.data.id;
-      });
-
-      _this6.vehicles[index].color = res.data.color;
-      _this6.vehicles[index].placa = res.data.placa;
+      // const index = this.vehicles.findIndex(itemSearch => itemSearch.id === res.data.id);
+      // this.vehicles[index].color = res.data.color;
+      // this.vehicles[index].placa = res.data.placa;
+      for (var i = 0; i < _this5.vehicles.data.length; i++) {
+        if (_this5.vehicles.data[i].id === res.data.id) {
+          _this5.vehicles.data[i].color = res.data.color;
+          _this5.vehicles.data[i].placa = res.data.placa;
+          _this5.vehicles.data[i].tipe_vehicle.description = res.data.tipe_vehicle.description;
+          _this5.vehicles.data[i].owner.identification_number = res.data.owner.identification_number;
+          break;
+        }
+      }
     });
   }
 });
@@ -64458,7 +64536,30 @@ var render = function() {
                     _c("i", { staticClass: "fas fa-user-plus" })
                   ]
                 )
-              ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "card-tools",
+                  staticStyle: { "margin-right": "10px" }
+                },
+                [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-block btn-danger",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.downloadPdf()
+                        }
+                      }
+                    },
+                    [_c("i", { staticClass: "fas fa-file-pdf" })]
+                  )
+                ]
+              )
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "card-body table-responsive p-0" }, [
@@ -65131,220 +65232,359 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
-    _c("div", { staticClass: "card" }, [
-      _vm._m(0),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-body" }, [
-        _c("div", { staticClass: "tab-content" }, [
-          _c("div", { staticClass: "form-group row" }, [
-            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
-              _vm._v("Name")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.owner.first_name + "   " + _vm.owner.second_name,
-                    expression: "owner.first_name +'   '+ owner.second_name"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { type: "text", readonly: "" },
-                domProps: {
-                  value: _vm.owner.first_name + "   " + _vm.owner.second_name
-                },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+    _c(
+      "div",
+      { staticClass: "card" },
+      [
+        _vm._m(0),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-body" }, [
+          _c("div", { staticClass: "tab-content" }, [
+            _c("div", { staticClass: "form-group row" }, [
+              _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                _vm._v("Name")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value:
+                        _vm.owner.first_name + "   " + _vm.owner.second_name,
+                      expression: "owner.first_name +'   '+ owner.second_name"
                     }
-                    _vm.$set(
-                      _vm.owner.first_name + "   " + _vm.owner,
-                      "second_name",
-                      $event.target.value
-                    )
-                  }
-                }
-              })
-            ]),
-            _vm._v(" "),
-            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
-              _vm._v("Last Name")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.owner.last_name,
-                    expression: "owner.last_name"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { type: "text", readonly: "" },
-                domProps: { value: _vm.owner.last_name },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", readonly: "" },
+                  domProps: {
+                    value: _vm.owner.first_name + "   " + _vm.owner.second_name
+                  },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.owner.first_name + "   " + _vm.owner,
+                        "second_name",
+                        $event.target.value
+                      )
                     }
-                    _vm.$set(_vm.owner, "last_name", $event.target.value)
                   }
-                }
-              })
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row" }, [
-            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
-              _vm._v("Identification")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.owner.identification_number,
-                    expression: "owner.identification_number"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { type: "text", readonly: "" },
-                domProps: { value: _vm.owner.identification_number },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+                })
+              ]),
+              _vm._v(" "),
+              _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                _vm._v("Last Name")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.owner.last_name,
+                      expression: "owner.last_name"
                     }
-                    _vm.$set(
-                      _vm.owner,
-                      "identification_number",
-                      $event.target.value
-                    )
-                  }
-                }
-              })
-            ]),
-            _vm._v(" "),
-            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
-              _vm._v("Address")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.owner.address,
-                    expression: "owner.address"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { type: "text", readonly: "" },
-                domProps: { value: _vm.owner.address },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", readonly: "" },
+                  domProps: { value: _vm.owner.last_name },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.owner, "last_name", $event.target.value)
                     }
-                    _vm.$set(_vm.owner, "address", $event.target.value)
                   }
-                }
-              })
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row" }, [
-            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
-              _vm._v("Phone number")
+                })
+              ])
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.owner.phone_number,
-                    expression: "owner.phone_number"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { type: "text", readonly: "" },
-                domProps: { value: _vm.owner.phone_number },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+            _c("div", { staticClass: "form-group row" }, [
+              _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                _vm._v("Identification")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.owner.identification_number,
+                      expression: "owner.identification_number"
                     }
-                    _vm.$set(_vm.owner, "phone_number", $event.target.value)
-                  }
-                }
-              })
-            ]),
-            _vm._v(" "),
-            _c("label", { staticClass: "col-sm-2 col-form-label" }, [
-              _vm._v("City")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-4 col-form-label" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.owner.city.city_name,
-                    expression: "owner.city.city_name"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { type: "text", readonly: "" },
-                domProps: { value: _vm.owner.city.city_name },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", readonly: "" },
+                  domProps: { value: _vm.owner.identification_number },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.owner,
+                        "identification_number",
+                        $event.target.value
+                      )
                     }
-                    _vm.$set(_vm.owner.city, "city_name", $event.target.value)
                   }
-                }
-              })
+                })
+              ]),
+              _vm._v(" "),
+              _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                _vm._v("Address")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.owner.address,
+                      expression: "owner.address"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", readonly: "" },
+                  domProps: { value: _vm.owner.address },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.owner, "address", $event.target.value)
+                    }
+                  }
+                })
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group row" }, [
+              _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                _vm._v("Phone number")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.owner.phone_number,
+                      expression: "owner.phone_number"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", readonly: "" },
+                  domProps: { value: _vm.owner.phone_number },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.owner, "phone_number", $event.target.value)
+                    }
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                _vm._v("City")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.owner.city.city_name,
+                      expression: "owner.city.city_name"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", readonly: "" },
+                  domProps: { value: _vm.owner.city.city_name },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.owner.city, "city_name", $event.target.value)
+                    }
+                  }
+                })
+              ])
             ])
           ])
-        ])
-      ]),
-      _vm._v(" "),
-      _vm._m(1),
-      _vm._v(" "),
-      _vm._m(2),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-footer bg-transparent border-dark" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary",
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.$router.go(-1)
+        ]),
+        _vm._v(" "),
+        _vm._l(_vm.owner.vehicle, function(vehicle, index) {
+          return _vm.owner.vehicle.length > 0
+            ? _c("div", [
+                _c("div", { staticClass: "card-header text-white bg-dark" }, [
+                  _c("span", [
+                    _c("i", { staticClass: "fas fa-car" }),
+                    _vm._v(" Vehicle Information " + _vm._s(index + 1))
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "card-body" }, [
+                  _c("div", { staticClass: "tab-content" }, [
+                    _c("div", { staticClass: "form-group row" }, [
+                      _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                        _vm._v("Placa")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: vehicle.placa,
+                              expression: "vehicle.placa"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "text", readonly: "" },
+                          domProps: { value: vehicle.placa },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(vehicle, "placa", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                        _vm._v("Brand")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: vehicle.brand,
+                              expression: "vehicle.brand"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "text", readonly: "" },
+                          domProps: { value: vehicle.brand },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(vehicle, "brand", $event.target.value)
+                            }
+                          }
+                        })
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group row" }, [
+                      _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                        _vm._v("Color")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: vehicle.color,
+                              expression: "vehicle.color"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "text", readonly: "" },
+                          domProps: { value: vehicle.color },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(vehicle, "color", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+                        _vm._v("Tipe of Vehicle")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-sm-4 col-form-label" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: vehicle.tipe_vehicle.description,
+                              expression: "vehicle.tipe_vehicle.description"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "text", readonly: "" },
+                          domProps: { value: vehicle.tipe_vehicle.description },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                vehicle.tipe_vehicle,
+                                "description",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
+                    ])
+                  ])
+                ])
+              ])
+            : _vm._e()
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-footer bg-transparent border-dark" }, [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  return _vm.$router.go(-1)
+                }
               }
-            }
-          },
-          [
-            _c("i", { staticClass: "fas fa-arrow-circle-left" }),
-            _vm._v(" Back\n            ")
-          ]
-        )
-      ])
-    ])
+            },
+            [
+              _c("i", { staticClass: "fas fa-arrow-circle-left" }),
+              _vm._v(" Back\n            ")
+            ]
+          )
+        ])
+      ],
+      2
+    )
   ])
 }
 var staticRenderFns = [
@@ -65357,25 +65597,6 @@ var staticRenderFns = [
         _c("i", { staticClass: "fas fa-user-alt-slash" }),
         _vm._v(" Driver Information")
       ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card-header text-white bg-dark" }, [
-      _c("span", [
-        _c("i", { staticClass: "fas fa-car" }),
-        _vm._v(" Vehicle Information")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card-body" }, [
-      _c("div", { staticClass: "tab-content" })
     ])
   }
 ]
@@ -66441,19 +66662,21 @@ var render = function() {
                 _vm._v(" "),
                 _c(
                   "tbody",
-                  _vm._l(_vm.vehicles, function(vehicle) {
+                  _vm._l(_vm.vehicles.data, function(vehicle) {
                     return _c("tr", { key: vehicle.id }, [
-                      _c("td", [_vm._v(_vm._s(vehicle.color))]),
-                      _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(vehicle.placa))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(vehicle.color))]),
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(vehicle.brand))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(vehicle.tipe_id))]),
+                      _c("td", [
+                        _vm._v(_vm._s(vehicle.tipe_vehicle.description))
+                      ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(vehicle.driver_id))]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(vehicle.owner_id))]),
+                      _c("td", [
+                        _vm._v(_vm._s(vehicle.owner.identification_number))
+                      ]),
                       _vm._v(" "),
                       _c("td", [
                         _vm._v(
@@ -66483,19 +66706,47 @@ var render = function() {
                             attrs: { type: "button" },
                             on: {
                               click: function($event) {
-                                return _vm.deleteUser(vehicle.id)
+                                return _vm.deleteVehicle(vehicle.id)
                               }
                             }
                           },
                           [_c("i", { staticClass: "fa fa-trash red" })]
-                        )
+                        ),
+                        _vm._v(" "),
+                        !vehicle.status
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-success btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.activeVehicle(vehicle.id)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "fas fa-exclamation" })]
+                            )
+                          : _vm._e()
                       ])
                     ])
                   }),
                   0
                 )
               ])
-            ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "card-footer" },
+              [
+                _c("pagination", {
+                  attrs: { data: _vm.vehicles },
+                  on: { "pagination-change-page": _vm.getResults }
+                })
+              ],
+              1
+            )
           ])
         ]
       )
@@ -66569,50 +66820,12 @@ var render = function() {
                   on: {
                     submit: function($event) {
                       $event.preventDefault()
-                      _vm.editmode ? _vm.updateUser() : _vm.createUser()
+                      _vm.editmode ? _vm.update() : _vm.create()
                     }
                   }
                 },
                 [
                   _c("div", { staticClass: "modal-body" }, [
-                    _c(
-                      "div",
-                      { staticClass: "form-group" },
-                      [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.form.color,
-                              expression: "form.color"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          class: { "is-invalid": _vm.form.errors.has("color") },
-                          attrs: {
-                            type: "text",
-                            name: "color",
-                            placeholder: "Color"
-                          },
-                          domProps: { value: _vm.form.color },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(_vm.form, "color", $event.target.value)
-                            }
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("has-error", {
-                          attrs: { form: _vm.form, field: "color" }
-                        })
-                      ],
-                      1
-                    ),
-                    _vm._v(" "),
                     _c(
                       "div",
                       { staticClass: "form-group" },
@@ -66660,6 +66873,44 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
+                              value: _vm.form.color,
+                              expression: "form.color"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          class: { "is-invalid": _vm.form.errors.has("color") },
+                          attrs: {
+                            type: "text",
+                            name: "color",
+                            placeholder: "Color"
+                          },
+                          domProps: { value: _vm.form.color },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(_vm.form, "color", $event.target.value)
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "color" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
                               value: _vm.form.brand,
                               expression: "form.brand"
                             }
@@ -66669,7 +66920,7 @@ var render = function() {
                           attrs: {
                             type: "text",
                             name: "brand",
-                            placeholder: "brand"
+                            placeholder: "Brand"
                           },
                           domProps: { value: _vm.form.brand },
                           on: {
@@ -66818,7 +67069,13 @@ var render = function() {
                                 [
                                   _vm._v(
                                     "\n                                    " +
-                                      _vm._s(owner.first_name) +
+                                      _vm._s(
+                                        owner.identification_number +
+                                          " - " +
+                                          owner.first_name +
+                                          " " +
+                                          owner.last_name
+                                      ) +
                                       "\n                                "
                                   )
                                 ]
@@ -66830,79 +67087,6 @@ var render = function() {
                         _vm._v(" "),
                         _c("has-error", {
                           attrs: { form: _vm.form, field: "owner_id" }
-                        })
-                      ],
-                      1
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      { staticClass: "form-group" },
-                      [
-                        _c(
-                          "select",
-                          {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.form.driver_id,
-                                expression: "form.driver_id"
-                              }
-                            ],
-                            staticClass: "form-control",
-                            class: {
-                              "is-invalid": _vm.form.errors.has("driver_id")
-                            },
-                            attrs: { name: "driver_id", id: "driver_id" },
-                            on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.$set(
-                                  _vm.form,
-                                  "driver_id",
-                                  $event.target.multiple
-                                    ? $$selectedVal
-                                    : $$selectedVal[0]
-                                )
-                              }
-                            }
-                          },
-                          [
-                            _c(
-                              "option",
-                              {
-                                attrs: { value: "", disabled: "", selected: "" }
-                              },
-                              [_vm._v("Select Driver")]
-                            ),
-                            _vm._v(" "),
-                            _vm._l(_vm.drivers, function(driver, key) {
-                              return _c(
-                                "option",
-                                { domProps: { value: driver.id } },
-                                [
-                                  _vm._v(
-                                    "\n                                    " +
-                                      _vm._s(driver.first_name) +
-                                      "\n                                "
-                                  )
-                                ]
-                              )
-                            })
-                          ],
-                          2
-                        ),
-                        _vm._v(" "),
-                        _c("has-error", {
-                          attrs: { form: _vm.form, field: "driver_id" }
                         })
                       ],
                       1
@@ -66968,15 +67152,13 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
-        _c("th", [_vm._v("Color")]),
-        _vm._v(" "),
         _c("th", [_vm._v("Placa")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Color")]),
         _vm._v(" "),
         _c("th", [_vm._v("Brand")]),
         _vm._v(" "),
         _c("th", [_vm._v("Tipe Vehicle")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Driver")]),
         _vm._v(" "),
         _c("th", [_vm._v("Owner")]),
         _vm._v(" "),

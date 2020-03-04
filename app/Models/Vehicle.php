@@ -13,7 +13,7 @@ class Vehicle extends Model
      * Get the owner record associated with the vehicle.
      */
     public function owner(){
-        return $this->hasOne('App\Models\Owner','id','owner_id');
+        return $this->belongsTo('App\Models\Owner','owner_id','id');
     }
 
     /**

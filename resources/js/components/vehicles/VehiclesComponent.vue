@@ -18,42 +18,48 @@
                         <table class="table table-hover">
                             <thead>
                             <tr>
-                                <th>Color</th>
                                 <th>Placa</th>
+                                <th>Color</th>
                                 <th>Brand</th>
                                 <th>Tipe Vehicle</th>
-                                <th>Driver</th>
                                 <th>Owner</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="vehicle in vehicles" :key="vehicle.id">
-                                <td>{{vehicle.color}}</td>
+                            <tr v-for="vehicle in vehicles.data" :key="vehicle.id">
                                 <td>{{vehicle.placa}}</td>
+                                <td>{{vehicle.color}}</td>
                                 <td>{{vehicle.brand}}</td>
-                                <td>{{vehicle.tipe_id}}</td>
-                                <td>{{vehicle.driver_id}}</td>
-                                <td>{{vehicle.owner_id}}</td>
+                                <td>{{vehicle.tipe_vehicle.description}}</td>
+                                <td>{{vehicle.owner.identification_number}}</td>
                                 <td>{{vehicle.status === 1 ? 'Activo' : 'Desactivo'}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" v-on:click="editModal(vehicle)">
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                            v-on:click="editModal(vehicle)">
                                         <i class="fa fa-edit blue"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm"
-                                            v-on:click="deleteUser(vehicle.id)">
+                                            v-on:click="deleteVehicle(vehicle.id)">
                                         <i class="fa fa-trash red"></i>
+                                    </button>
+                                    <button v-if="!vehicle.status" type="button" class="btn btn-success btn-sm"
+                                            v-on:click="activeVehicle(vehicle.id)">
+                                        <i class="fas fa-exclamation"></i>
                                     </button>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
+                    <!-- pagination --->
+                    <div class="card-footer">
+                        <pagination :data="vehicles" @pagination-change-page="getResults"></pagination>
+                    </div>
                 </div>
             </div>
         </div>
-
         <div class="modal fade" id="addUser" tabindex="-1" role="dialog" aria-labelledby="addUserLabel"
              aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -67,8 +73,14 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form @submit.prevent="editmode ? updateUser() : createUser()">
+                    <form @submit.prevent="editmode ? update() : create()">
                         <div class="modal-body">
+                            <div class="form-group">
+                                <input v-model="form.placa" type="text" name="placa"
+                                       placeholder="Placa"
+                                       class="form-control" :class="{ 'is-invalid': form.errors.has('placa') }">
+                                <has-error :form="form" field="placa"></has-error>
+                            </div>
                             <div class="form-group">
                                 <input v-model="form.color" type="text" name="color"
                                        placeholder="Color"
@@ -77,14 +89,8 @@
                             </div>
 
                             <div class="form-group">
-                                <input v-model="form.placa" type="text" name="placa"
-                                       placeholder="Placa"
-                                       class="form-control" :class="{ 'is-invalid': form.errors.has('placa') }">
-                                <has-error :form="form" field="placa"></has-error>
-                            </div>
-                            <div class="form-group">
                                 <input v-model="form.brand" type="text" name="brand"
-                                       placeholder="brand"
+                                       placeholder="Brand"
                                        class="form-control" :class="{ 'is-invalid': form.errors.has('brand') }">
                                 <has-error :form="form" field="brand"></has-error>
                             </div>
@@ -104,22 +110,11 @@
                                         :class="{ 'is-invalid': form.errors.has('owner_id') }">
                                     <option value="" disabled selected>Select Owner</option>
                                     <option v-for="(owner,key) in owners" :value="owner.id">
-                                        {{owner.first_name}}
+                                        {{owner.identification_number +' - '+owner.first_name +' '+ owner.last_name}}
                                     </option>
                                 </select>
                                 <has-error :form="form" field="owner_id"></has-error>
                             </div>
-                            <div class="form-group">
-                                <select name="driver_id" v-model="form.driver_id" id="driver_id" class="form-control"
-                                        :class="{ 'is-invalid': form.errors.has('driver_id') }">
-                                    <option value="" disabled selected>Select Driver</option>
-                                    <option v-for="(driver,key) in drivers" :value="driver.id">
-                                        {{driver.first_name}}
-                                    </option>
-                                </select>
-                                <has-error :form="form" field="driver_id"></has-error>
-                            </div>
-
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close <i
@@ -145,63 +140,63 @@
             return {
 
                 editmode: false,
-                vehicles: [],
+                vehicles: {},
                 owners: [],
-                drivers:[],
-                tipes:[],
+                drivers: [],
+                tipes: [],
                 form: new Form({
                     id: '',
                     color: '',
                     placa: '',
                     brand: '',
                     tipe_vehicle: '',
-                    owner_id:'',
-                    driver_id:'',
-                    tipe_id:'',
+                    owner_id: '',
+                    tipe_id: '',
                 })
             }
         },
         methods: {
             /**
-             * Load all drivers
+             * Load paginate vehicles
              */
-            loadAllVehicles() {
-                axios.get(`api/vehicle`)
-                    .then((res) => {
-                        this.vehicles = res.data
+            getResults(page = 1) {
+                axios.get(`api/get-vehicle-paginate?=page=${page}`)
+                    .then(res => {
+                        this.vehicles = res.data;
                     })
+
             },
             /**
              *Create user
              */
-            createUser() {
+            create() {
                 this.editmode = false;
                 this.form.post('api/vehicle')
-                    .then(() => {
+                    .then((res) => {
                         vm.$emit('afterCreate');
-                        $('#addUser').modal('hide')
-                        toast.fire('Success!', 'Vehicle Created in successfully.', 'success');
+                        $('#addUser').modal('hide');
+                        toast.fire('Success!', res.data.message, 'success');
                     })
-                    .catch(() => {
-                        toast.fire('Uops!', 'Complete all fields!', 'warning');
+                    .catch((error) => {
+                        toast.fire('Uops!', error.response.message, 'warning');
                     })
             },
 
             /**
              * update informatio vehicle
              */
-            updateUser() {
+            update() {
                 console.log(this.form);
                 // console.log('Editing data');
                 this.form.put('api/vehicle/' + this.form.id)
                     .then((res) => {
                         // success
                         $('#addUser').modal('hide');
-                        toast.fire('Updated!', 'Vehicle: ' + res.data.placa.toUpperCase() + ' has been updated.', 'success')
-                        vm.$emit('afterUpdate', res);
+                        toast.fire('Updated!', res.data.message, 'success');
+                        vm.$emit('afterUpdate', res.data);
                     })
-                    .catch(() => {
-                        toast.fire('Error!', 'There was something wronge.', 'error')
+                    .catch((error) => {
+                        toast.fire('Error!', error.response.message, 'error')
                     });
             },
 
@@ -209,22 +204,47 @@
              * Change status user
              * @param id
              */
-            deleteUser(id) {
+            deleteVehicle(id) {
                 swal.fire({
-                    title: 'Are you sure?',
+                    title: 'Do you want to continue?',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Delete'
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Delete',
+                    reverseButtons: true
                 }).then((result) => {
                     // Send request to the server
                     if (result.value) {
                         this.form.delete('api/vehicle/' + id).then(() => {
-                            toast.fire('Success!', 'Vehicle has been deleted.', 'success');
+                            toast.fire('Success!', res.data.message, 'success');
                             vm.$emit('afterCreate');
-                        }).catch(() => {
-                            toast.fire('Error!', 'There was something wronge.', 'error');
+                        }).catch((error) => {
+                            toast.fire('Error!', error.response.data.message, 'error');
                         });
+                    }
+                })
+            },
+
+            /**
+             *Active status of driver
+             */
+            activeVehicle(id) {
+                swal.fire({
+                    title: 'Do you want to continue?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Confirm',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value) {
+                        axios.get(`api/owners/${id}/edit`)
+                            .then((res) => {
+                                toast.fire('Success', res.data.message, 'success');
+                                vm.$emit('afterUpdate', res.data);
+                            }).catch((error) => {
+                            toast.fire('Error!', error.response.message, 'error')
+                        })
                     }
                 })
             },
@@ -271,33 +291,32 @@
                         this.owners = res.data
                     })
             },
-            /**
-             * Load all drivers
-             */
-            loadDrivers() {
-                axios.get(`api/drivers`)
-                    .then((res) => {
-                        this.drivers = res.data
-                    })
-            },
         },
 
         /**
          * Methods first charge
          */
         created() {
+            this.getResults();
             this.loadVehicles();
-            this.loadDrivers();
             this.loadOwners();
-            this.loadAllVehicles();
             vm.$on('afterCreate', () => {
                 this.loadVehicles();
             });
             //event
             vm.$on('afterUpdate', (res) => {
-                const index = this.vehicles.findIndex(itemSearch => itemSearch.id === res.data.id);
-                this.vehicles[index].color = res.data.color;
-                this.vehicles[index].placa = res.data.placa;
+                // const index = this.vehicles.findIndex(itemSearch => itemSearch.id === res.data.id);
+                // this.vehicles[index].color = res.data.color;
+                // this.vehicles[index].placa = res.data.placa;
+                for (var i = 0; i < this.vehicles.data.length; i++) {
+                    if (this.vehicles.data[i].id === res.data.id) {
+                        this.vehicles.data[i].color = res.data.color;
+                        this.vehicles.data[i].placa = res.data.placa;
+                        this.vehicles.data[i].tipe_vehicle.description = res.data.tipe_vehicle.description;
+                        this.vehicles.data[i].owner.identification_number = res.data.owner.identification_number;
+                        break;
+                    }
+                }
             })
         }
     }
