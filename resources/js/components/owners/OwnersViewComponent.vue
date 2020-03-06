@@ -1,8 +1,7 @@
 <template>
     <div class="container">
         <div class="card">
-            <div class="card-header text-white bg-dark"><span><i
-                class="fas fa-user-alt-slash"></i> Driver Information</span>
+            <div class="card-header text-white bg-dark"><span><i class="fas fa-user-tie"></i> Owner Information</span>
             </div>
             <div class="card-body">
                 <div class="tab-content">
@@ -92,11 +91,10 @@
             }
         },
         methods:{
-            loadViewOwner(){
+        loadViewOwner(){
                 let id = this.$route.params.id;
                 axios.get(`api/owners/${id}`).then((res) => {
                     this.owner = res.data;
-                    console.log(this.owner.vehicle.length);
                 })
             }
         }

@@ -58,10 +58,10 @@ class VehiclesController extends Controller
             $vehicle->owner_id = $request->owner_id;
             $vehicle->save();
 
-            return response()->json(['message' => 'Vehicle: ' . $vehicle->placa . ', Created in successfully.'], 200);
+            return response()->json(['message' => 'Vehicle: ' . $vehicle->placa . ', Created in successfully.'], 201);
 
-        } catch (\Exception $exception) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+        } catch (\Exception $e) {
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
 
         }
     }
@@ -86,15 +86,14 @@ class VehiclesController extends Controller
     public function edit($id)
     {
         try {
-
             $vehicle = Vehicle::with('owner', 'tipeVehicle')->find($id);
             $vehicle->status = 1;
             $vehicle->update();
 
-            return response()->json(['message' => 'Vehicle: ' . $vehicle->placa . ', Created in successfully.', 'data' => $owner], 200);
+            return response()->json(['message' => 'Vehicle: ' . $vehicle->placa . ', Created in successfully.', 'data' => $vehicle], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
         }
     }
 
@@ -127,8 +126,8 @@ class VehiclesController extends Controller
             $data = Vehicle::with('owner','tipeVehicle')->find($id);
             return response()->json(['message' => 'Vehicle: ' . $vehicle->placa . ', has been updated.', 'data' => $data], 200);
 
-        } catch (\Exception $exception) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+        } catch (\Exception $e) {
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
 
         }
     }
@@ -142,14 +141,14 @@ class VehiclesController extends Controller
     public function destroy($id)
     {
         try {
-            $vehicle = Owner::with('city')->find($id);
+            $vehicle = Vehicle::with('owner','tipeVehicle')->find($id);
             // delete soft
             $vehicle->status = 0;
             $vehicle->update();
             return response()->json(['message' => 'Vehicle has been deleted.', 'data' => $vehicle], 200);
 
-        } catch (\Exception $exception) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+        } catch (\Exception $e) {
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
 
         }
     }

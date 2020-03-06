@@ -38,7 +38,7 @@
                                             v-on:click="deleteCity(city.id)">
                                         <i class="fa fa-trash red"></i>
                                     </button>
-                                    <button v-if="!city.status" type="button" class="btn btn-success btn-sm"
+                                    <button v-if="!city.status" type="button" class="btn btn-warning btn-sm"
                                             v-on:click="activeCity(city.id)">
                                         <i class="fas fa-exclamation"></i>
                                     </button>
@@ -124,6 +124,7 @@
                 })
             }
         },
+
         methods: {
             getResults(page = 1) {
                 axios.get('api/get-city-paginate?page=' + page)
@@ -203,8 +204,9 @@
                             toast.fire('Success!', res.data.message, 'success');
                             console.log(res);
                             vm.$emit('afterUpdate', res.data);
-                        }).catch(() => {
-                            toast.fire('Error!', 'There was something wronge.', 'error');
+                        }).catch((error) => {
+                            console.log(error.response.data);
+                            toast.fire('Error!', error.response.data.message, 'error');
                         });
                     }
                 })

@@ -22,7 +22,9 @@ class CitiesController extends Controller
      */
     public function index()
     {
-        return City::where('status', '=', 1)->get();
+        return City::where('status', '=', 1)
+            ->with('departament')
+            ->get();
     }
 
     /**
@@ -54,10 +56,11 @@ class CitiesController extends Controller
             $city->status = 1;
             $city->save();
 
-            return response()->json(['message' => 'City: ' . $city->city_name . ' Created in successfully.'], 200);
+            return response()->json(['message' => 'City: ' . $city->city_name . ' Created in successfully.'], 201);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
+
         }
 
     }
@@ -85,7 +88,8 @@ class CitiesController extends Controller
         $city->status = 1;
         $city->update();
 
-        return response()->json(['message' => 'City: ' . $city->city_name . ', has been actived.', 'data' => $city], 200);
+        return response()->json(['message' => 'City: ' . $city->city_name.', has been actived.', 'data' => $city], 200);
+
     }
 
     /**
@@ -113,9 +117,8 @@ class CitiesController extends Controller
 
             return response()->json(['message' => 'City: ' . $city->city_name . ', has been updated.', 'data' => $city], 200);
 
-        } catch (\Exception $exception) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
-
+        } catch (\Exception $e) {
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
         }
 
 
@@ -131,14 +134,19 @@ class CitiesController extends Controller
     {
         try {
 
-            $city = City::with('departament')->find($id);
+            $city = City::with('departament','owner')->find($id);
+            if(count($city->owner)>0){
+                return response()->json(['code'=>'0002','message' => 'Can´t delete, because have associated records ','description'=>'Table owners and drivers have city associated '], 422);
+            }
+
             $city->status = 0;
             $city->update();
 
             return response()->json(['message' => 'City has been deleted.','data'=>$city], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
+
         }
 
     }

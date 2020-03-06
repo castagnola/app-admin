@@ -55,6 +55,10 @@ export default new VueRouter({
             component: require('./components/cities/CitiesComponent').default
         },
         {
+          path:'/routes',
+          component: require('./components/routes/RoutesComponent').default
+        },
+        {
             path: '*',
             component: require('./views/404').default,
         },

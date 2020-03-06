@@ -2096,8 +2096,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             toast.fire('Success!', res.data.message, 'success');
             console.log(res);
             vm.$emit('afterUpdate', res.data);
-          })["catch"](function () {
-            toast.fire('Error!', 'There was something wronge.', 'error');
+          })["catch"](function (error) {
+            console.log(error.response.data);
+            toast.fire('Error!', error.response.data.message, 'error');
           });
         }
       });
@@ -2893,7 +2894,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
 
     /**
-     * Load all owners
+     * Load all cities
      */
     loadCities: function loadCities() {
       var _this2 = this;
@@ -2919,12 +2920,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      */
     create: function create() {
       this.editmode = false;
-      this.form.post('api/owners').then(function () {
+      this.form.post('api/owners').then(function (res) {
+        console.log(res);
         vm.$emit('afterCreate');
         $('#addOwners').modal('hide');
         toast.fire('Success!', res.data.message, 'success');
       })["catch"](function (error) {
-        toast.fire('Uops!', error.response.message, 'warning');
+        toast.fire('Error!', error.response.message, 'error');
       });
     },
 
@@ -2960,6 +2962,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         // Send request to the server
         if (result.value) {
           _this3.form["delete"]("api/owners/".concat(id)).then(function (res) {
+            console.log(res);
             toast.fire('Success!', res.data.message, 'success');
             vm.$emit('afterUpdate', res.data);
           })["catch"](function (error) {
@@ -3019,12 +3022,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.getResults();
     this.loadCities();
     vm.$on('afterCreate', function () {
-      _this4.getResult();
+      _this4.getResults();
     }); //event
 
     vm.$on('afterUpdate', function (res) {
-      console.log(res.data.city);
-
       for (var i = 0; i < _this4.owners.data.length; i++) {
         if (_this4.owners.data[i].id === res.data.id) {
           _this4.owners.data[i].identification_number = res.data.identification_number;
@@ -3132,7 +3133,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "OwnersViewComponent",
   created: function created() {
@@ -3150,7 +3150,6 @@ __webpack_require__.r(__webpack_exports__);
       var id = this.$route.params.id;
       axios.get("api/owners/".concat(id)).then(function (res) {
         _this.owner = res.data;
-        console.log(_this.owner.vehicle.length);
       });
     }
   }
@@ -3417,8 +3416,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -3474,6 +3471,179 @@ __webpack_require__.r(__webpack_exports__);
     return {
       role: {}
     };
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/routes/RoutesComponent.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/routes/RoutesComponent.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "RoutesComponent",
+  data: function data() {
+    return {
+      editmode: false,
+      cities: [],
+      tipe_routes: ['IDA', 'REGRESO'],
+      form: new Form({
+        id: '',
+        starting_city_id: '',
+        destination_city_id: '',
+        tipe_route: ''
+      })
+    };
+  },
+  methods: {
+    /**
+     * Show modal to create new routes
+     */
+    newModal: function newModal() {
+      this.editmode = false;
+      this.form.reset();
+      this.form.clear();
+      $('#addRoute').modal('show');
+    },
+
+    /**
+     * Load all cities
+     */
+    loadCities: function loadCities() {
+      var _this = this;
+
+      axios.get("api/city").then(function (res) {
+        _this.cities = res.data;
+      });
+    },
+    onChange: function onChange(event) {
+      console.log(event.target.value);
+      var elem = this.cities.findIndex(function (itemSearch) {
+        return itemSearch.id === event.target.value;
+      });
+      console.log(elem);
+    }
+  },
+  created: function created() {
+    this.loadCities();
   }
 });
 
@@ -3915,7 +4085,6 @@ __webpack_require__.r(__webpack_exports__);
       editmode: false,
       vehicles: {},
       owners: [],
-      drivers: [],
       tipes: [],
       form: new Form({
         id: '',
@@ -3988,9 +4157,9 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (result) {
         // Send request to the server
         if (result.value) {
-          _this2.form["delete"]('api/vehicle/' + id).then(function () {
+          _this2.form["delete"]('api/vehicle/' + id).then(function (res) {
             toast.fire('Success!', res.data.message, 'success');
-            vm.$emit('afterCreate');
+            vm.$emit('afterUpdate', res.data);
           })["catch"](function (error) {
             toast.fire('Error!', error.response.data.message, 'error');
           });
@@ -4011,7 +4180,7 @@ __webpack_require__.r(__webpack_exports__);
         reverseButtons: true
       }).then(function (result) {
         if (result.value) {
-          axios.get("api/owners/".concat(id, "/edit")).then(function (res) {
+          axios.get("api/vehicle/".concat(id, "/edit")).then(function (res) {
             toast.fire('Success', res.data.message, 'success');
             vm.$emit('afterUpdate', res.data);
           })["catch"](function (error) {
@@ -4089,6 +4258,7 @@ __webpack_require__.r(__webpack_exports__);
           _this5.vehicles.data[i].placa = res.data.placa;
           _this5.vehicles.data[i].tipe_vehicle.description = res.data.tipe_vehicle.description;
           _this5.vehicles.data[i].owner.identification_number = res.data.owner.identification_number;
+          _this5.vehicles.data[i].status = res.data.status;
           break;
         }
       }
@@ -63172,7 +63342,7 @@ var render = function() {
                           ? _c(
                               "button",
                               {
-                                staticClass: "btn btn-success btn-sm",
+                                staticClass: "btn btn-warning btn-sm",
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
@@ -63651,7 +63821,7 @@ var render = function() {
                             ? _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-success btn-sm",
+                                  staticClass: "btn btn-warning btn-sm",
                                   attrs: { type: "button" },
                                   on: {
                                     click: function($event) {
@@ -64623,7 +64793,7 @@ var render = function() {
                             ? _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-success btn-sm",
+                                  staticClass: "btn btn-warning btn-sm",
                                   attrs: { type: "button" },
                                   on: {
                                     click: function($event) {
@@ -65594,8 +65764,8 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "card-header text-white bg-dark" }, [
       _c("span", [
-        _c("i", { staticClass: "fas fa-user-alt-slash" }),
-        _vm._v(" Driver Information")
+        _c("i", { staticClass: "fas fa-user-tie" }),
+        _vm._v(" Owner Information")
       ])
     ])
   }
@@ -65946,7 +66116,7 @@ var render = function() {
         [
           _c("div", { staticClass: "card" }, [
             _c("div", { staticClass: "card-header" }, [
-              _c("h3", { staticClass: "card-title" }, [_vm._v("Roles List")]),
+              _vm._m(0),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
                 _c(
@@ -66049,7 +66219,17 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "card-title" }, [
+      _c("i", { staticClass: "fas fa-user-tag" }),
+      _vm._v(" Roles List")
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -66076,6 +66256,528 @@ var render = function() {
   ])
 }
 var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/routes/RoutesComponent.vue?vue&type=template&id=540d54f9&scoped=true&":
+/*!*************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/routes/RoutesComponent.vue?vue&type=template&id=540d54f9&scoped=true& ***!
+  \*************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "row mt-5" }, [
+      _c(
+        "div",
+        { staticClass: "col-md-12", staticStyle: { "margin-top": "10px" } },
+        [
+          _c("div", { staticClass: "card" }, [
+            _c("div", { staticClass: "card-header" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-tools" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-block btn-outline-success",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.newModal()
+                      }
+                    }
+                  },
+                  [
+                    _vm._v("Add new\n                            "),
+                    _c("i", { staticClass: "fas fa-road" })
+                  ]
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _vm._m(1)
+          ])
+        ]
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "addRoute",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "addRouteLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-dialog-centered",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c(
+                  "h5",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.editmode,
+                        expression: "!editmode"
+                      }
+                    ],
+                    staticClass: "modal-title",
+                    attrs: { id: "addRouteLabel" }
+                  },
+                  [_vm._v("Add New "), _c("i", { staticClass: "fas fa-road" })]
+                ),
+                _vm._v(" "),
+                _c(
+                  "h5",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.editmode,
+                        expression: "editmode"
+                      }
+                    ],
+                    staticClass: "modal-title",
+                    attrs: { id: "addRouteLabel" }
+                  },
+                  [
+                    _vm._v("Update City "),
+                    _c("i", { staticClass: "fas fa-road" })
+                  ]
+                ),
+                _vm._v(" "),
+                _vm._m(2)
+              ]),
+              _vm._v(" "),
+              _c(
+                "form",
+                {
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      _vm.editmode ? _vm.update() : _vm.create()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.starting_city_id,
+                                expression: "form.starting_city_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.form.errors.has(
+                                "starting_city_id"
+                              )
+                            },
+                            attrs: {
+                              name: "departament_id",
+                              id: "starting_city_id"
+                            },
+                            on: {
+                              change: [
+                                function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    _vm.form,
+                                    "starting_city_id",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                },
+                                function($event) {
+                                  return _vm.onChange($event)
+                                }
+                              ]
+                            }
+                          },
+                          [
+                            _c(
+                              "option",
+                              {
+                                attrs: { value: "", disabled: "", selected: "" }
+                              },
+                              [_vm._v("Select Starting")]
+                            ),
+                            _vm._v(" "),
+                            _vm._l(_vm.cities, function(city, key) {
+                              return _c(
+                                "option",
+                                { domProps: { value: city.id } },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(
+                                        city.city_name +
+                                          " - " +
+                                          city.departament.departament_name
+                                      ) +
+                                      "\n                                "
+                                  )
+                                ]
+                              )
+                            })
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "departament_id" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.destination_city_id,
+                                expression: "form.destination_city_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.form.errors.has(
+                                "destination_city_id"
+                              )
+                            },
+                            attrs: {
+                              name: "departament_id",
+                              id: "destination_city_id"
+                            },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "destination_city_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c(
+                              "option",
+                              {
+                                attrs: { value: "", disabled: "", selected: "" }
+                              },
+                              [_vm._v("Select Destination")]
+                            ),
+                            _vm._v(" "),
+                            _vm._l(_vm.cities, function(city, key) {
+                              return _c(
+                                "option",
+                                { domProps: { value: city.id } },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(
+                                        city.city_name +
+                                          " - " +
+                                          city.departament.departament_name
+                                      ) +
+                                      "\n                                "
+                                  )
+                                ]
+                              )
+                            })
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "departament_id" }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.tipe_route,
+                                expression: "form.tipe_route"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.form.errors.has("tipe_route")
+                            },
+                            attrs: { name: "tipe_route", id: "tipe_route" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "tipe_route",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c(
+                              "option",
+                              {
+                                attrs: { value: "", disabled: "", selected: "" }
+                              },
+                              [_vm._v("Select Type of Route")]
+                            ),
+                            _vm._v(" "),
+                            _vm._l(_vm.tipe_routes, function(tipe_route, key) {
+                              return _c(
+                                "option",
+                                { domProps: { value: key } },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(_vm.tipe_routes[key]) +
+                                      "\n                                "
+                                  )
+                                ]
+                              )
+                            })
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "departament_id" }
+                        })
+                      ],
+                      1
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _vm._m(3),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: _vm.editmode,
+                            expression: "editmode"
+                          }
+                        ],
+                        staticClass: "btn btn-success",
+                        attrs: { type: "submit" }
+                      },
+                      [
+                        _vm._v("Save "),
+                        _c("i", { staticClass: "fas fa-check" })
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: !_vm.editmode,
+                            expression: "!editmode"
+                          }
+                        ],
+                        staticClass: "btn btn-success",
+                        attrs: { type: "submit" }
+                      },
+                      [
+                        _vm._v("Create "),
+                        _c("i", { staticClass: "fas fa-plus" })
+                      ]
+                    )
+                  ])
+                ]
+              )
+            ])
+          ]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "card-title" }, [
+      _c("i", { staticClass: "fas fa-road" }),
+      _vm._v(" Routes List")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card-body table-responsive p-0" }, [
+      _c("table", { staticClass: "table table-hover" }, [
+        _c("thead", [
+          _c("tr", [
+            _c("th", [_vm._v("Starting")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Destination")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Status")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Type Route")]),
+            _vm._v(" "),
+            _c("th", [_vm._v("Action")])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("tbody", [
+          _c("tr", [
+            _c("td"),
+            _vm._v(" "),
+            _c("td"),
+            _vm._v(" "),
+            _c("td"),
+            _vm._v(" "),
+            _c("td"),
+            _vm._v(" "),
+            _c("td", [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary btn-sm",
+                  attrs: { type: "button" }
+                },
+                [_c("i", { staticClass: "fa fa-edit blue" })]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-danger btn-sm",
+                  attrs: { type: "button" }
+                },
+                [_c("i", { staticClass: "fa fa-trash red" })]
+              )
+            ])
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "modal",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-danger",
+        attrs: { type: "button", "data-dismiss": "modal" }
+      },
+      [_vm._v("Close "), _c("i", { staticClass: "fas fa-times" })]
+    )
+  }
+]
 render._withStripped = true
 
 
@@ -66630,9 +67332,7 @@ var render = function() {
         [
           _c("div", { staticClass: "card" }, [
             _c("div", { staticClass: "card-header" }, [
-              _c("h3", { staticClass: "card-title" }, [
-                _vm._v("Vehicles List")
-              ]),
+              _vm._m(0),
               _vm._v(" "),
               _c("div", { staticClass: "card-tools" }, [
                 _c(
@@ -66658,7 +67358,7 @@ var render = function() {
             _vm._v(" "),
             _c("div", { staticClass: "card-body table-responsive p-0" }, [
               _c("table", { staticClass: "table table-hover" }, [
-                _vm._m(0),
+                _vm._m(1),
                 _vm._v(" "),
                 _c(
                   "tbody",
@@ -66685,39 +67385,43 @@ var render = function() {
                       ]),
                       _vm._v(" "),
                       _c("td", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.editModal(vehicle)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-edit blue" })]
-                        ),
+                        vehicle.status
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.editModal(vehicle)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "fa fa-edit blue" })]
+                            )
+                          : _vm._e(),
                         _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                return _vm.deleteVehicle(vehicle.id)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-trash red" })]
-                        ),
+                        vehicle.status
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-danger btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.deleteVehicle(vehicle.id)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "fa fa-trash red" })]
+                            )
+                          : _vm._e(),
                         _vm._v(" "),
                         !vehicle.status
                           ? _c(
                               "button",
                               {
-                                staticClass: "btn btn-success btn-sm",
+                                staticClass: "btn btn-warning btn-sm",
                                 attrs: { type: "button" },
                                 on: {
                                   click: function($event) {
@@ -66811,7 +67515,7 @@ var render = function() {
                   ]
                 ),
                 _vm._v(" "),
-                _vm._m(1)
+                _vm._m(2)
               ]),
               _vm._v(" "),
               _c(
@@ -67094,7 +67798,7 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "modal-footer" }, [
-                    _vm._m(2),
+                    _vm._m(3),
                     _vm._v(" "),
                     _c(
                       "button",
@@ -67146,6 +67850,15 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "card-title" }, [
+      _c("i", { staticClass: "fas fa-car" }),
+      _vm._v(" Vehicles List")
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -83153,6 +83866,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/routes/RoutesComponent.vue":
+/*!************************************************************!*\
+  !*** ./resources/js/components/routes/RoutesComponent.vue ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _RoutesComponent_vue_vue_type_template_id_540d54f9_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./RoutesComponent.vue?vue&type=template&id=540d54f9&scoped=true& */ "./resources/js/components/routes/RoutesComponent.vue?vue&type=template&id=540d54f9&scoped=true&");
+/* harmony import */ var _RoutesComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./RoutesComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/routes/RoutesComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _RoutesComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _RoutesComponent_vue_vue_type_template_id_540d54f9_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _RoutesComponent_vue_vue_type_template_id_540d54f9_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "540d54f9",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/routes/RoutesComponent.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/routes/RoutesComponent.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/routes/RoutesComponent.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_RoutesComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./RoutesComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/routes/RoutesComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_RoutesComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/routes/RoutesComponent.vue?vue&type=template&id=540d54f9&scoped=true&":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/js/components/routes/RoutesComponent.vue?vue&type=template&id=540d54f9&scoped=true& ***!
+  \*******************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_RoutesComponent_vue_vue_type_template_id_540d54f9_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./RoutesComponent.vue?vue&type=template&id=540d54f9&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/routes/RoutesComponent.vue?vue&type=template&id=540d54f9&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_RoutesComponent_vue_vue_type_template_id_540d54f9_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_RoutesComponent_vue_vue_type_template_id_540d54f9_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/users/UsersComponent.vue":
 /*!**********************************************************!*\
   !*** ./resources/js/components/users/UsersComponent.vue ***!
@@ -83343,6 +84125,9 @@ vue__WEBPACK_IMPORTED_MODULE_1___default.a.use(vue_router__WEBPACK_IMPORTED_MODU
   }, {
     path: '/cities',
     component: __webpack_require__(/*! ./components/cities/CitiesComponent */ "./resources/js/components/cities/CitiesComponent.vue")["default"]
+  }, {
+    path: '/routes',
+    component: __webpack_require__(/*! ./components/routes/RoutesComponent */ "./resources/js/components/routes/RoutesComponent.vue")["default"]
   }, {
     path: '*',
     component: __webpack_require__(/*! ./views/404 */ "./resources/js/views/404.vue")["default"]

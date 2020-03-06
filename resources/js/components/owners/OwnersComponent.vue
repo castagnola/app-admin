@@ -49,7 +49,7 @@
                                             v-on:click="deleteOwner(owner.id)">
                                         <i class="fa fa-trash red"></i>
                                     </button>
-                                    <button v-if="!owner.status" type="button" class="btn btn-success btn-sm"
+                                    <button v-if="!owner.status" type="button" class="btn btn-warning btn-sm"
                                             v-on:click="activeOwner(owner.id)">
                                         <i class="fas fa-exclamation"></i>
                                     </button>
@@ -216,8 +216,9 @@
                     })
 
             },
+
             /**
-             * Load all owners
+             * Load all cities
              */
             loadCities() {
                 axios.get(`api/city`)
@@ -243,13 +244,14 @@
             create() {
                 this.editmode = false;
                 this.form.post('api/owners')
-                    .then(() => {
+                    .then((res) => {
+                        console.log(res);
                         vm.$emit('afterCreate');
-                        $('#addOwners').modal('hide')
+                        $('#addOwners').modal('hide');
                         toast.fire('Success!', res.data.message, 'success');
                     })
                     .catch((error) => {
-                        toast.fire('Uops!', error.response.message, 'warning');
+                        toast.fire('Error!', error.response.message, 'error');
                     })
             },
 
@@ -284,6 +286,7 @@
                     // Send request to the server
                     if (result.value) {
                         this.form.delete(`api/owners/${id}`).then((res) => {
+                            console.log(res);
                             toast.fire('Success!', res.data.message, 'success');
                             vm.$emit('afterUpdate', res.data);
                         }).catch((error) => {
@@ -346,11 +349,10 @@
             this.getResults();
             this.loadCities();
             vm.$on('afterCreate', () => {
-                this.getResult();
+                this.getResults();
             });
             //event
             vm.$on('afterUpdate', (res) => {
-                console.log(res.data.city)
                 for (var i = 0; i < this.owners.data.length; i++) {
                     if (this.owners.data[i].id === res.data.id) {
                         this.owners.data[i].identification_number = res.data.identification_number;

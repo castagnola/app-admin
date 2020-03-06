@@ -139,7 +139,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <router-link to="/#" class="nav-link">
+                                <router-link to="/routes" class="nav-link">
                                     <i class="fas fa-road"></i>
                                     <p>Routes</p>
                                 </router-link>

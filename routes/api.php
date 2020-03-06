@@ -36,6 +36,7 @@ Route::resource('drivers','ResourceController\DriversController');
 Route::resource('tipe-vehicles','ResourceController\TipeVehiclesController');
 Route::resource('vehicle','ResourceController\VehiclesController');
 Route::resource('department','ResourceController\DepartmentsController');
+Route::resource('route','ResourceController\RoutesController');
 
 /**
  * Api Custom Routes

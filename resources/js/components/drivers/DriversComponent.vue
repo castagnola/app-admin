@@ -47,7 +47,7 @@
                                             v-on:click="deleteDriver(driver.id)">
                                         <i class="fa fa-trash red"></i>
                                     </button>
-                                    <button v-if="!driver.status" type="button" class="btn btn-success btn-sm"
+                                    <button v-if="!driver.status" type="button" class="btn btn-warning btn-sm"
                                             v-on:click="activeDriver(driver.id)">
                                         <i class="fas fa-exclamation"></i>
                                     </button>

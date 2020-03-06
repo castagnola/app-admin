@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\ResourceController;
 
-use App\Models\Departament;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class DepartmentsController extends Controller
+class RoutesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +14,7 @@ class DepartmentsController extends Controller
      */
     public function index()
     {
-        return Departament::where('status','=',1)->get();
+        //
     }
 
     /**

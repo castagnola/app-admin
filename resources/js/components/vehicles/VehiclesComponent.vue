@@ -4,7 +4,7 @@
             <div style="margin-top: 10px" class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Vehicles List</h3>
+                        <h3 class="card-title"><i class="fas fa-car"></i> Vehicles List</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add
@@ -36,15 +36,15 @@
                                 <td>{{vehicle.owner.identification_number}}</td>
                                 <td>{{vehicle.status === 1 ? 'Activo' : 'Desactivo'}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm"
+                                    <button v-if="vehicle.status" type="button" class="btn btn-primary btn-sm"
                                             v-on:click="editModal(vehicle)">
                                         <i class="fa fa-edit blue"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm"
+                                    <button v-if="vehicle.status"type="button" class="btn btn-danger btn-sm"
                                             v-on:click="deleteVehicle(vehicle.id)">
                                         <i class="fa fa-trash red"></i>
                                     </button>
-                                    <button v-if="!vehicle.status" type="button" class="btn btn-success btn-sm"
+                                    <button v-if="!vehicle.status" type="button" class="btn btn-warning btn-sm"
                                             v-on:click="activeVehicle(vehicle.id)">
                                         <i class="fas fa-exclamation"></i>
                                     </button>
@@ -142,7 +142,6 @@
                 editmode: false,
                 vehicles: {},
                 owners: [],
-                drivers: [],
                 tipes: [],
                 form: new Form({
                     id: '',
@@ -215,9 +214,9 @@
                 }).then((result) => {
                     // Send request to the server
                     if (result.value) {
-                        this.form.delete('api/vehicle/' + id).then(() => {
+                        this.form.delete('api/vehicle/' + id).then((res) => {
                             toast.fire('Success!', res.data.message, 'success');
-                            vm.$emit('afterCreate');
+                            vm.$emit('afterUpdate', res.data);
                         }).catch((error) => {
                             toast.fire('Error!', error.response.data.message, 'error');
                         });
@@ -238,7 +237,7 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.value) {
-                        axios.get(`api/owners/${id}/edit`)
+                        axios.get(`api/vehicle/${id}/edit`)
                             .then((res) => {
                                 toast.fire('Success', res.data.message, 'success');
                                 vm.$emit('afterUpdate', res.data);
@@ -314,6 +313,7 @@
                         this.vehicles.data[i].placa = res.data.placa;
                         this.vehicles.data[i].tipe_vehicle.description = res.data.tipe_vehicle.description;
                         this.vehicles.data[i].owner.identification_number = res.data.owner.identification_number;
+                        this.vehicles.data[i].status = res.data.status;
                         break;
                     }
                 }

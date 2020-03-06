@@ -21,7 +21,7 @@ class DriversController extends Controller
      */
     public function index()
     {
-        return Driver::all();
+        return Driver::where('status','=',1);
     }
 
     /**
@@ -65,8 +65,9 @@ class DriversController extends Controller
 
             return response()->json(['message' => 'Driver: ' . $driver->first_name . ' ' . $driver->last_name . ', Created in successfully.'], 200);
 
-        } catch (\Exception $exception) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+        } catch (\Exception $e) {
+            return response()->json(['code'=>0001,'message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
+
 
         }
 
@@ -100,7 +101,8 @@ class DriversController extends Controller
             return response()->json(['message' => 'Driver: ' . $driver->first_name . ' ' . $driver->last_name . ', has been actived.', 'data' => $driver], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
+
         }
     }
 
@@ -138,7 +140,8 @@ class DriversController extends Controller
 
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
+
 
         }
 
@@ -161,7 +164,7 @@ class DriversController extends Controller
             return response()->json(['message' => 'City has been deleted.', 'data' => $driver], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
         }
 
     }

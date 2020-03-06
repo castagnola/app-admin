@@ -4,7 +4,7 @@
             <div style="margin-top: 10px" class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Roles List</h3>
+                        <h3 class="card-title"><i class="fas fa-user-tag"></i> Roles List</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-block btn-outline-success"
                                     v-on:click="newModal()">Add new
@@ -40,7 +40,6 @@
                                             v-on:click="deleteRole(role.id)">
                                         <i class="fa fa-trash red"></i>
                                     </button>
-
                                 </td>
                             </tr>
                             </tbody>
@@ -51,9 +50,7 @@
         </div>
     </div>
 </template>
-
 <script>
-
     export default {
         data() {
             return {

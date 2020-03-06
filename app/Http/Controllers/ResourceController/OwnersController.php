@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ResourceController;
 
 use App\Models\Owner;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use PHPUnit\Framework\MockObject\Exception;
@@ -22,7 +23,7 @@ class OwnersController extends Controller
      */
     public function index()
     {
-        return Owner::all();
+        return Owner::where('status', '=', 1)->get();
     }
 
     /**
@@ -44,7 +45,7 @@ class OwnersController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'identification_number' => 'required|string|max:10',
+            'identification_number' => 'required|max:10|unique:owners,identification_number',
             'first_name' => 'required|string|max:50',
             'second_name' => 'required|string|max:50',
             'last_name' => 'required|string|max:50',
@@ -65,7 +66,8 @@ class OwnersController extends Controller
             return response()->json(['message' => 'Owner: ' . $owner->first_name . ' ' . $owner->last_name . ', Created in successfully.'], 200);
 
         } catch (\Exception $exception) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
 
         }
     }
@@ -78,7 +80,11 @@ class OwnersController extends Controller
      */
     public function show($id)
     {
-        return Owner::with('city','vehicle.tipeVehicle')->find($id);
+
+    return Owner::with(array('city', 'vehicle'=>function($q){
+           $q->where('status',1)->with('tipeVehicle');
+    }))->find($id);
+
     }
 
     /**
@@ -91,14 +97,21 @@ class OwnersController extends Controller
     {
         try {
 
-            $owner = Owner::with('city')->find($id);
+            $owner = Owner::with('city','vehicle')->find($id);
+            if (count($owner->vehicle) > 0) {
+                foreach ($owner->vehicle as $value) {
+                    $vehicle = Vehicle::find($value->id);
+                    $vehicle->status = 1;
+                    $vehicle->update();
+                }
+            }
             $owner->status = 1;
             $owner->update();
 
             return response()->json(['message' => 'Owner: ' . $owner->first_name . ' ' . $owner->last_name . ', has been actived.', 'data' => $owner], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
         }
     }
 
@@ -112,7 +125,7 @@ class OwnersController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'identification_number' => 'required|max:10',
+            'identification_number' => 'required|max:10|unique:owners,identification_number,' . $request->id,
             'first_name' => 'required|string|max:50',
             'second_name' => 'required|string|max:50',
             'last_name' => 'required|string|max:50',
@@ -131,10 +144,10 @@ class OwnersController extends Controller
             $owner->city_id = $request->city_id;
             $owner->update();
             $data = Owner::with('city')->find($id);
-            return response()->json(['message' => 'Driver: ' . $owner->first_name . ' ' . $owner->last_name . ', has been updated.', 'data' => $data], 200);
+            return response()->json(['message' => 'Owner: ' . $owner->first_name . ' ' . $owner->last_name . ', has been updated.', 'data' => $data], 200);
 
         } catch (\Exception $exception) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
 
         }
 
@@ -149,14 +162,21 @@ class OwnersController extends Controller
     public function destroy($id)
     {
         try {
-            $owner = Owner::with('city')->find($id);
+            $owner = Owner::with('city', 'vehicle')->find($id);
+            if (count($owner->vehicle) > 0) {
+                foreach ($owner->vehicle as $value) {
+                    $vehicle = Vehicle::find($value->id);
+                    $vehicle->status = 0;
+                    $vehicle->update();
+                }
+            }
             // delete soft
             $owner->status = 0;
             $owner->update();
             return response()->json(['message' => 'Owner has been deleted.', 'data' => $owner], 200);
 
-        } catch (\Exception $exception) {
-            return response()->json(['message' => 'There was something wronge.'], 500);
+        } catch (\Exception $e) {
+            return response()->json(['code'=>'0001','message' => 'There was something wronge.','description'=>$e->getMessage()], 500);
 
         }
 
