@@ -3605,6 +3605,7 @@ __webpack_require__.r(__webpack_exports__);
       editmode: false,
       cities: [],
       tipe_routes: ['IDA', 'REGRESO'],
+      routes: {},
       form: new Form({
         id: '',
         starting_city_id: '',
@@ -3614,6 +3615,19 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    /**
+     * Load paginate owners
+     */
+    getResults: function getResults() {
+      var _this = this;
+
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      axios.get("api/get-route-paginate?=page=".concat(page)).then(function (res) {
+        console.log(res.data);
+        _this.routes = res.data;
+      });
+    },
+
     /**
      * Show modal to create new routes
      */
@@ -3628,22 +3642,76 @@ __webpack_require__.r(__webpack_exports__);
      * Load all cities
      */
     loadCities: function loadCities() {
-      var _this = this;
+      var _this2 = this;
 
       axios.get("api/city").then(function (res) {
-        _this.cities = res.data;
+        _this2.cities = res.data;
       });
     },
-    onChange: function onChange(event) {
-      console.log(event.target.value);
-      var elem = this.cities.findIndex(function (itemSearch) {
-        return itemSearch.id === event.target.value;
+
+    /**
+     * Create a new Route
+     */
+    create: function create() {
+      this.editmode = false;
+      this.form.post('api/route').then(function (res) {
+        console.log(res);
+        vm.$emit('afterCreate');
+        $('#addOwners').modal('hide');
+        toast.fire('Success!', res.data.message, 'success');
+      })["catch"](function (error) {
+        toast.fire('Error!', error.response.message, 'error');
       });
-      console.log(elem);
-    }
+    },
+
+    /**
+     * Update  Owner
+     */
+    update: function update() {
+      this.form.put('api/route/' + this.form.id).then(function (res) {
+        // success
+        $('#addRoute').modal('hide');
+        toast.fire('Updated!', res.data.message, 'success');
+        vm.$emit('afterUpdate', res.data);
+      })["catch"](function (error) {
+        toast.fire('Error!', error.response.message, 'error');
+      });
+    },
+
+    /**
+     * @param data
+     */
+    editModal: function editModal(data) {
+      this.editmode = true;
+      this.form.reset();
+      this.form.clear();
+      $('#addRoute').modal('show');
+      this.form.fill(data);
+    } // onChange(event){
+    //   console.log(event.target.value);
+    // const elem = this.cities.findIndex(itemSearch => itemSearch.id === event.target.value);
+    //console.log(elem);
+    //            }
+
   },
   created: function created() {
+    var _this3 = this;
+
     this.loadCities();
+    this.getResults();
+    vm.$on('afterCreate', function () {
+      _this3.getResults();
+    }); //event
+
+    vm.$on('afterUpdate', function (res) {
+      for (var i = 0; i < _this3.routes.data.length; i++) {
+        if (_this3.routes.data[i].id === res.data.id) {
+          _this3.routes.data[i].destination_city.city_name = res.data.destination_city.city_name;
+          _this3.routes.data[i].starting_city.city_name = res.data.starting_city.city_name;
+          _this3.routes.data[i].tipe_route = res.data.tipe_route;
+        }
+      }
+    });
   }
 });
 
@@ -66307,7 +66375,57 @@ var render = function() {
               ])
             ]),
             _vm._v(" "),
-            _vm._m(1)
+            _c("div", { staticClass: "card-body table-responsive p-0" }, [
+              _c("table", { staticClass: "table table-hover" }, [
+                _vm._m(1),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  _vm._l(_vm.routes.data, function(route) {
+                    return _c("tr", { key: route.id }, [
+                      _c("td", [_vm._v(_vm._s(route.starting_city.city_name))]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(_vm._s(route.destination_city.city_name))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(_vm._s(route.tipe_route ? "REGRESO" : "IDA"))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary btn-sm",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                return _vm.editModal(route)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fa fa-edit blue" })]
+                        )
+                      ])
+                    ])
+                  }),
+                  0
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "card-footer" },
+              [
+                _c("pagination", {
+                  attrs: { data: _vm.routes },
+                  on: { "pagination-change-page": _vm.getResults }
+                })
+              ],
+              1
+            )
           ])
         ]
       )
@@ -66697,53 +66815,15 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card-body table-responsive p-0" }, [
-      _c("table", { staticClass: "table table-hover" }, [
-        _c("thead", [
-          _c("tr", [
-            _c("th", [_vm._v("Starting")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Destination")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Status")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Type Route")]),
-            _vm._v(" "),
-            _c("th", [_vm._v("Action")])
-          ])
-        ]),
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Starting")]),
         _vm._v(" "),
-        _c("tbody", [
-          _c("tr", [
-            _c("td"),
-            _vm._v(" "),
-            _c("td"),
-            _vm._v(" "),
-            _c("td"),
-            _vm._v(" "),
-            _c("td"),
-            _vm._v(" "),
-            _c("td", [
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-primary btn-sm",
-                  attrs: { type: "button" }
-                },
-                [_c("i", { staticClass: "fa fa-edit blue" })]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-danger btn-sm",
-                  attrs: { type: "button" }
-                },
-                [_c("i", { staticClass: "fa fa-trash red" })]
-              )
-            ])
-          ])
-        ])
+        _c("th", [_vm._v("Destination")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Type Route")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Action")])
       ])
     ])
   },

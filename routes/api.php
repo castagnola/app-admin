@@ -45,3 +45,4 @@ Route::get('get-city-paginate','CustomController\CitiesController@index');
 Route::get('get-driver-paginate','CustomController\DriversController@index');
 Route::get('get-owner-paginate','CustomController\OwnersController@index');
 Route::get('get-vehicle-paginate','CustomController\VehiclesController@index');
+Route::get('get-route-paginate','CustomController\RoutesController@index');

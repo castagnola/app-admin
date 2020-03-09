@@ -18,28 +18,28 @@
                             <tr>
                                 <th>Starting</th>
                                 <th>Destination</th>
-                                <th>Status</th>
                                 <th>Type Route</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                            <tr v-for="route in routes.data" :key="route.id">
+                                <td>{{route.starting_city.city_name}}</td>
+                                <td>{{route.destination_city.city_name}}</td>
+                                <td>{{route.tipe_route ? 'REGRESO' : 'IDA'}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm">
+                                    <button type="button" class="btn btn-primary btn-sm"
+                                            v-on:click="editModal(route)">
                                         <i class="fa fa-edit blue"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash red"></i>
                                     </button>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <!-- pagination --->
+                    <div class="card-footer">
+                        <pagination :data="routes" @pagination-change-page="getResults"></pagination>
                     </div>
                 </div>
             </div>
@@ -122,20 +122,29 @@
                     'IDA',
                     'REGRESO'
                 ],
+                routes:{},
                 form: new Form({
                     id: '',
                     starting_city_id: '',
                     destination_city_id: '',
                     tipe_route: '',
-
-
                 })
 
             }
 
         },
         methods:{
+            /**
+             * Load paginate owners
+             */
+            getResults(page = 1) {
+                axios.get(`api/get-route-paginate?=page=${page}`)
+                    .then(res => {
+                        console.log(res.data);
+                        this.routes = res.data;
+                    })
 
+            },
             /**
              * Show modal to create new routes
              */
@@ -155,15 +164,70 @@
                         this.cities = res.data;
                     })
             },
-            onChange(event){
-                console.log(event.target.value);
-                const elem = this.cities.findIndex(itemSearch => itemSearch.id === event.target.value);
-                console.log(elem);
 
-            }
+            /**
+             * Create a new Route
+             */
+            create() {
+                this.editmode = false;
+                this.form.post('api/route')
+                    .then((res) => {
+                        console.log(res);
+                        vm.$emit('afterCreate');
+                        $('#addOwners').modal('hide');
+                        toast.fire('Success!', res.data.message, 'success');
+                    })
+                    .catch((error) => {
+                        toast.fire('Error!', error.response.message, 'error');
+                    })
+            },
+            /**
+             * Update  Owner
+             */
+            update() {
+                this.form.put('api/route/' + this.form.id)
+                    .then((res) => {
+                        // success
+                        $('#addRoute').modal('hide');
+                        toast.fire('Updated!', res.data.message, 'success');
+                        vm.$emit('afterUpdate', res.data);
+                    }).catch((error) => {
+                    toast.fire('Error!', error.response.message, 'error')
+                });
+            },
+
+            /**
+             * @param data
+             */
+            editModal(data) {
+                this.editmode = true;
+                this.form.reset();
+                this.form.clear();
+                $('#addRoute').modal('show');
+                this.form.fill(data);
+            },
+           // onChange(event){
+             //   console.log(event.target.value);
+               // const elem = this.cities.findIndex(itemSearch => itemSearch.id === event.target.value);
+                //console.log(elem);
+//            }
         },
         created() {
             this.loadCities();
+            this.getResults();
+            vm.$on('afterCreate', () => {
+                this.getResults();
+            });
+            //event
+            vm.$on('afterUpdate', (res) => {
+                for (var i = 0; i < this.routes.data.length; i++) {
+                    if (this.routes.data[i].id === res.data.id) {
+                        this.routes.data[i].destination_city.city_name = res.data.destination_city.city_name;
+                        this.routes.data[i].starting_city.city_name = res.data.starting_city.city_name;
+                        this.routes.data[i].tipe_route = res.data.tipe_route;
+                    }
+                }
+            })
         },
 
 

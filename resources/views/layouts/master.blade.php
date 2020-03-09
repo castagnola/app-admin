@@ -86,12 +86,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </p>
                             </router-link>
                         </li>
-                        <li class="nav-item">
+                        <!--<li class="nav-item">
                             <router-link to="/roles" class="nav-link">
                                 <i class=" nav-icon fas fa-user-tag"></i>
                                 <p>Roles</p>
                             </router-link>
-                        </li>
+                        </li>-->
                     @endcan
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
@@ -145,12 +145,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </router-link>
                             </li>
                         </ul>
-                    <li class="nav-item">
-                        <router-link to="/#" class="nav-link">
-                            <i class="fab fa-autoprefixer"></i>
-                            <p>Assignment of drivers</p>
-                        </router-link>
-                    </li>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('logout') }}"
